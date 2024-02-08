@@ -118,11 +118,17 @@ public class InputFrame extends JFrame{
         yearLevelField.setText(year);
     }
     public void setCourseText(String course){
-        courseCodeBox.setSelectedItem(course);
+        if(course.equals("None")){
+            courseCodeBox.setSelectedIndex(-1);
+        }
+        else{
+            courseCodeBox.setSelectedItem(course);
+        }
     }
     public void setCourseCodeList(String[] courseCodeList){
         courseCodeBox = new JComboBox(courseCodeList);
         inputField.add(courseCodeBox);
+        courseCodeBox.setSelectedIndex(-1);
         courseCodeBox.setBounds(X+100,Y*5, 100,30);
     }
     public void setCourseField(String courseCode){
@@ -147,6 +153,9 @@ public class InputFrame extends JFrame{
         return yearLevelField.getText();
     }
     public String getCourseCode(String[] courseCodeList){
+        if(courseCodeBox.getSelectedIndex() == -1){
+            return "None";
+        }
         return courseCodeList[courseCodeBox.getSelectedIndex()];
     }
     public String getCourseField(){

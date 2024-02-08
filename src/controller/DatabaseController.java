@@ -145,7 +145,7 @@ public class DatabaseController {
             if(type == 0){
                 selectedIndex = selectStudent.getSelected();
                 if(actionType.equals("Delete")){
-                    modelDB.deleteStudent(selectedIndex);
+                    modelDB.delete(selectedIndex, 0);
                     modelDB.saveData(0);
                     studentDB.tableModel.removeRow(selectedIndex);
                     selectStudent.dispose();
@@ -169,7 +169,7 @@ public class DatabaseController {
             if(type == 1){
                 selectedIndex = selectCourse.getSelected();
                 if(actionType.equals("Delete")){
-                    modelDB.deleteCourse(selectedIndex);
+                    modelDB.delete(selectedIndex, 1);
                     modelDB.saveData(1);
                     courseDB.tableModel.removeRow(selectedIndex);
                     selectCourse.dispose();

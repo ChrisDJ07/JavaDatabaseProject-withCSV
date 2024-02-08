@@ -120,36 +120,11 @@ public class DatabaseModel {
         
         return data;
     }
-    /*Set data of selected student*/
-    public void setData(int index, String[] data, int type){
-        if(type == 0){
-            studentObjects.get(index).setName(data[0]);
-            studentObjects.get(index).setGender(data[1]);
-            studentObjects.get(index).setId(data[2]);
-            studentObjects.get(index).setYear(data[3]);
-            studentObjects.get(index).setCourseCode(data[4]);
-            studentList.set(index, data[0]);
-        }
-        if(type == 1){
-            courseObjects.get(index).setCourseCode(data[0]);
-            courseObjects.get(index).setCourseName(data[1]);
-            courseCodeList.set(index, data[0]);
-        }
-    }
-    /*Remove each instance of specified student object and data*/
-    public void deleteStudent(int index){
-        studentObjects.remove(index);
-        studentList.remove(index);
-    }
     
     /*Create a new course object and set its code and name*/
     public void createNewCourse(String courseCode, String courseName){
         courseObjects.add(new Courses(courseCode, courseName));
         courseCodeList.add(courseCode);
-    }
-    public void deleteCourse(int index){
-        courseObjects.remove(index);
-        courseCodeList.remove(index);
     }
     /*Method to extract Course Data*/
     public void extractCourseData(){
@@ -182,9 +157,40 @@ public class DatabaseModel {
         return studentObjects.get(index).getCourseName();
     }
     
+    /*Set data of selected student/course*/
+    public void setData(int index, String[] data, int type){
+        if(type == 0){
+            studentObjects.get(index).setName(data[0]);
+            studentObjects.get(index).setGender(data[1]);
+            studentObjects.get(index).setId(data[2]);
+            studentObjects.get(index).setYear(data[3]);
+            studentObjects.get(index).setCourseCode(data[4]);
+            studentList.set(index, data[0]);
+        }
+        if(type == 1){
+            courseObjects.get(index).setCourseCode(data[0]);
+            courseObjects.get(index).setCourseName(data[1]);
+            courseCodeList.set(index, data[0]);
+        }
+    }
+    /*Remove each instance of specified student/course object and data*/
+    public void delete(int index, int type){
+        if(type == 0){
+            studentObjects.remove(index);
+            studentList.remove(index);
+        }
+        if(type == 1){
+            courseObjects.remove(index);
+            courseCodeList.remove(index);
+        }
+    }
     /*Match course code of student-course and assign values to each objects*/
     public void matchCourseCode(){
         for(Students student: studentObjects){
+            if(student.getCourseCode().equals("None")){
+                student.setCourseName("Not Enrolled");
+                continue;
+            }
             for(Courses course: courseObjects){
                 if(student.getCourseCode().equals(course.getCourseCode())){
                     student.setCourseName(course.getCourseName());
