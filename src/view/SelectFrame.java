@@ -14,12 +14,20 @@ public class SelectFrame extends JFrame{
     int height = 200;
     
     JButton selectButton = new JButton("SUBMIT");
-    JLabel label = new JLabel("SELECT STUDENT:");
-    JComboBox studentList;
+    JLabel label;
+    JComboBox list;
     
     
-    public SelectFrame(String title){
+    
+    public SelectFrame(String title, int type){
         super(title);
+        
+        if(type == 0){
+           label = new JLabel("SELECT STUDENT:");
+        }
+        if(type == 1){
+           label = new JLabel("SELECT COURSE:");
+        }
         
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLayout(null);
@@ -41,15 +49,15 @@ public class SelectFrame extends JFrame{
     }
     
     /*Set-up Drop-down option*/
-    public void setStudentList(String[] students){
-        studentList = new JComboBox(students);
-        this.add(studentList);
-        studentList.setBounds(150, 40, 150, 30);
+    public void setList(String[] data){
+        list = new JComboBox(data);
+        this.add(list);
+        list.setBounds(150, 40, 150, 30);
     }
     
     /*Return current selected student*/
-    public int getSelectedStudent(){
-        return studentList.getSelectedIndex();
+    public int getSelected(){
+        return list.getSelectedIndex();
     }
 
 }

@@ -14,11 +14,13 @@ import view.SelectFrame;
  */
 public class DatabaseController {
     
+    //can probably be optimized more
     private DatabaseFrame studentDB;
     private DatabaseFrame courseDB;
     private DatabaseModel modelDB;
     private InputFrame input;
     private SelectFrame selectStudent;
+    private SelectFrame selectCourse;
     
     //integer for GUI type, 0-students 1-courses
     int type;
@@ -100,13 +102,12 @@ public class DatabaseController {
                 if(actionType.equals("Edit")){
                     String[] studentData = {input.getNameText(), input.getGenderType(),input.getIdText(),
                                              input.getYearText(), input.getCourseCode(modelDB.courseCodeList.toArray(new String[0]))};
-                    modelDB.setStudentData(selectedIndex, studentData);
+                    modelDB.setData(selectedIndex, studentData, 0);
                     modelDB.saveData(0);
                     modelDB.matchCourseCode();
                     studentDB.tableModel.removeRow(selectedIndex);
-                    String[] newStudentData = {input.getNameText(), input.getGenderType(),input.getIdText(),
-                                             input.getYearText(), modelDB.getCourseName(selectedIndex)};
-                    studentDB.tableModel.addRow(newStudentData);
+                    studentData[4] = modelDB.getCourseName(selectedIndex);
+                    studentDB.tableModel.insertRow(selectedIndex,studentData);
                     input.dispose();
                 }
             }
@@ -119,7 +120,12 @@ public class DatabaseController {
                     input.dispose();
                 }
                 if(actionType.equals("Edit")){
-                    //to do code here
+                    String[] courseData = {input.getCourseField(), input.getCourseNameField()};
+                    modelDB.setData(selectedIndex, courseData, 1);
+                    modelDB.saveData(1);
+                    courseDB.tableModel.removeRow(selectedIndex);
+                    courseDB.tableModel.insertRow(selectedIndex, courseData);
+                    input.dispose();
                 }
             }
         }
@@ -135,8 +141,9 @@ public class DatabaseController {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            int selectedIndex = selectStudent.getSelectedStudent();
+            int selectedIndex;
             if(type == 0){
+                selectedIndex = selectStudent.getSelected();
                 if(actionType.equals("Delete")){
                     modelDB.deleteStudent(selectedIndex);
                     modelDB.saveData(0);
@@ -148,18 +155,33 @@ public class DatabaseController {
                     input.addSubmitListener(new submitListener("Edit", selectedIndex));
                     input.setCourseCodeList(modelDB.courseCodeList.toArray(new String[0]));
 
-                    String[] currentStudentData = modelDB.getStudentData(selectedIndex);
-                    input.setNameText(currentStudentData[0]);
-                    input.setIdText(currentStudentData[1]);
-                    input.setYearText(currentStudentData[2]);
-                    input.setGenderType(currentStudentData[3]);
-                    input.setCourseText(currentStudentData[4]);
+                    String[] currentData = modelDB.getData(selectedIndex, 0);
+                    input.setNameText(currentData[0]);
+                    input.setIdText(currentData[1]);
+                    input.setYearText(currentData[2]);
+                    input.setGenderType(currentData[3]);
+                    input.setCourseText(currentData[4]);
 
                     selectStudent.dispose();
                 }
             }
+            /*Update student enrolled to deleted course*/
             if(type == 1){
-                //to do code here
+                selectedIndex = selectCourse.getSelected();
+                if(actionType.equals("Delete")){
+                    modelDB.deleteCourse(selectedIndex);
+                    modelDB.saveData(1);
+                    courseDB.tableModel.removeRow(selectedIndex);
+                    selectCourse.dispose();
+                }
+                if(actionType.equals("Edit")){
+                    input = new InputFrame("Edit Course Data", 1);
+                    input.addSubmitListener(new submitListener("Edit", selectedIndex));
+                    String[] currentData = modelDB.getData(selectedIndex, 1);
+                    input.setCourseField(currentData[0]);
+                    input.setCourseNameField(currentData[1]);
+                    selectCourse.dispose();
+                }
             }
         }
     }
@@ -182,26 +204,49 @@ public class DatabaseController {
     class editListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
-            selectStudent = new SelectFrame("Select Student Data to Edit");
-            selectStudent.addSelectListener(new selectListener("Edit"));
-            selectStudent.setStudentList(modelDB.studentList.toArray(new String[0]));
+            if(type == 0){
+                selectStudent = new SelectFrame("Select Student Data to Edit", 0);
+                selectStudent.addSelectListener(new selectListener("Edit"));
+                selectStudent.setList(modelDB.studentList.toArray(new String[0]));
+            }
+            if(type == 1){
+                selectCourse = new SelectFrame("Select Course Data to Edit", 1);
+                selectCourse.addSelectListener(new selectListener("Edit"));
+                selectCourse.setList(modelDB.courseCodeList.toArray(new String[0]));
+            }
         }
     }
     class deleteListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
-            selectStudent = new SelectFrame("Select Student Data to Delete");
-            selectStudent.addSelectListener(new selectListener("Delete"));
-            selectStudent.setStudentList(modelDB.studentList.toArray(new String[0]));
+            if(type == 0){
+                selectStudent = new SelectFrame("Select Student Data to Delete",1);
+                selectStudent.addSelectListener(new selectListener("Delete"));
+                selectStudent.setList(modelDB.studentList.toArray(new String[0]));
+            }
+            if(type == 1){
+                selectCourse = new SelectFrame("Select Course Data to Delete", 1);
+                selectCourse.addSelectListener(new selectListener("Delete"));
+                selectCourse.setList(modelDB.courseCodeList.toArray(new String[0]));
+            }
         }
     }
     class clearListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
-            modelDB.studentObjects.clear();
-            modelDB.saveData(0);
-            for(int i=studentDB.tableModel.getRowCount()-1; i>=0; i--){
-                studentDB.tableModel.removeRow(i);
+            if(type == 0){
+                modelDB.studentObjects.clear();
+                modelDB.saveData(0);
+                for(int i=studentDB.tableModel.getRowCount()-1; i>=0; i--){
+                    studentDB.tableModel.removeRow(i);
+                }
+            }
+            if(type == 1){
+                modelDB.courseObjects.clear();
+                modelDB.saveData(1);
+                for(int i=courseDB.tableModel.getRowCount()-1; i>=0; i--){
+                    courseDB.tableModel.removeRow(i);
+                }
             }
         }
     }

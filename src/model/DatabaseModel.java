@@ -108,20 +108,33 @@ public class DatabaseModel {
          }
     }
     /*Returns the student data of index specified student object*/
-    public String[] getStudentData(int index){
-        String[] studentData = {studentObjects.get(index).getName(), studentObjects.get(index).getId(), studentObjects.get(index).getYear()
+    public String[] getData(int index, int type){
+        String[] data = null;
+        if(type == 0){
+            data = new String[]{studentObjects.get(index).getName(), studentObjects.get(index).getId(), studentObjects.get(index).getYear()
                                 ,studentObjects.get(index).getGender(), studentObjects.get(index).getCourseCode()};
-        return studentData;
+        }
+        if(type == 1){
+            data = new String[]{courseObjects.get(index).getCourseCode(), courseObjects.get(index).getCourseName()};
+        }
+        
+        return data;
     }
     /*Set data of selected student*/
-    public void setStudentData(int index, String[] data){
-        studentObjects.get(index).setName(data[0]);
-        studentObjects.get(index).setGender(data[1]);
-        studentObjects.get(index).setId(data[2]);
-        studentObjects.get(index).setYear(data[3]);
-        studentObjects.get(index).setCourseCode(data[4]);
-        
-        studentList.set(index, data[0]);
+    public void setData(int index, String[] data, int type){
+        if(type == 0){
+            studentObjects.get(index).setName(data[0]);
+            studentObjects.get(index).setGender(data[1]);
+            studentObjects.get(index).setId(data[2]);
+            studentObjects.get(index).setYear(data[3]);
+            studentObjects.get(index).setCourseCode(data[4]);
+            studentList.set(index, data[0]);
+        }
+        if(type == 1){
+            courseObjects.get(index).setCourseCode(data[0]);
+            courseObjects.get(index).setCourseName(data[1]);
+            courseCodeList.set(index, data[0]);
+        }
     }
     /*Remove each instance of specified student object and data*/
     public void deleteStudent(int index){
@@ -133,6 +146,10 @@ public class DatabaseModel {
     public void createNewCourse(String courseCode, String courseName){
         courseObjects.add(new Courses(courseCode, courseName));
         courseCodeList.add(courseCode);
+    }
+    public void deleteCourse(int index){
+        courseObjects.remove(index);
+        courseCodeList.remove(index);
     }
     /*Method to extract Course Data*/
     public void extractCourseData(){
