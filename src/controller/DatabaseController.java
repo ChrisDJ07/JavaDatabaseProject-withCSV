@@ -17,11 +17,11 @@ public class DatabaseController {
     private DatabaseFrame studentDB;
     private DatabaseFrame courseDB;
     private DatabaseModel modelDB;
-    private InputFrame inputStudent;
+    private InputFrame input;
     private SelectFrame selectStudent;
     
     //integer for GUI type, 0-students 1-courses
-    private int type;
+    int type;
     
     public DatabaseController(DatabaseFrame frameDB, DatabaseModel modelDB, int type){
         this.modelDB = modelDB;
@@ -72,9 +72,6 @@ public class DatabaseController {
                 }
             }
         }
-        
-        
-        
     }
     
     /*InputFrame ActionListener*/
@@ -89,27 +86,41 @@ public class DatabaseController {
         
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(actionType.equals("Add")){
-                modelDB.createNewStudent(inputStudent.getNameText(), inputStudent.getGenderType(),inputStudent.getIdText(),
-                                         inputStudent.getYearText(), inputStudent.getCourseCode(modelDB.courseCodeList.toArray(new String[0])));
-                modelDB.saveStudentData();
-                modelDB.matchCourseCode();
-                String[] newStudentData = {inputStudent.getNameText(), inputStudent.getGenderType(),inputStudent.getIdText(),
-                                         inputStudent.getYearText(), modelDB.getCourseName(modelDB.studentList.size()-1)};
-                studentDB.tableModel.addRow(newStudentData);
-                inputStudent.dispose();
+            if(type == 0){
+                if(actionType.equals("Add")){
+                    modelDB.createNewStudent(input.getNameText(), input.getGenderType(),input.getIdText(),
+                                             input.getYearText(), input.getCourseCode(modelDB.courseCodeList.toArray(new String[0])));
+                    modelDB.saveData(0);
+                    modelDB.matchCourseCode();
+                    String[] newStudentData = {input.getNameText(), input.getGenderType(),input.getIdText(),
+                                             input.getYearText(), modelDB.getCourseName(modelDB.studentList.size()-1)};
+                    studentDB.tableModel.addRow(newStudentData);
+                    input.dispose();
+                }
+                if(actionType.equals("Edit")){
+                    String[] studentData = {input.getNameText(), input.getGenderType(),input.getIdText(),
+                                             input.getYearText(), input.getCourseCode(modelDB.courseCodeList.toArray(new String[0]))};
+                    modelDB.setStudentData(selectedIndex, studentData);
+                    modelDB.saveData(0);
+                    modelDB.matchCourseCode();
+                    studentDB.tableModel.removeRow(selectedIndex);
+                    String[] newStudentData = {input.getNameText(), input.getGenderType(),input.getIdText(),
+                                             input.getYearText(), modelDB.getCourseName(selectedIndex)};
+                    studentDB.tableModel.addRow(newStudentData);
+                    input.dispose();
+                }
             }
-            if(actionType.equals("Edit")){
-                String[] studentData = {inputStudent.getNameText(), inputStudent.getGenderType(),inputStudent.getIdText(),
-                                         inputStudent.getYearText(), inputStudent.getCourseCode(modelDB.courseCodeList.toArray(new String[0]))};
-                modelDB.setStudentData(selectedIndex, studentData);
-                modelDB.saveStudentData();
-                modelDB.matchCourseCode();
-                studentDB.tableModel.removeRow(selectedIndex);
-                String[] newStudentData = {inputStudent.getNameText(), inputStudent.getGenderType(),inputStudent.getIdText(),
-                                         inputStudent.getYearText(), modelDB.getCourseName(selectedIndex)};
-                studentDB.tableModel.addRow(newStudentData);
-                inputStudent.dispose();
+            if(type == 1){
+                if(actionType.equals("Add")){
+                    modelDB.createNewCourse(input.getCourseField(), input.getCourseNameField());
+                    modelDB.saveData(1);
+                    String[] newCourseData = {input.getCourseField(), input.getCourseNameField()};
+                    courseDB.tableModel.addRow(newCourseData);
+                    input.dispose();
+                }
+                if(actionType.equals("Edit")){
+                    //to do code here
+                }
             }
         }
     }
@@ -125,30 +136,49 @@ public class DatabaseController {
         @Override
         public void actionPerformed(ActionEvent e) {
             int selectedIndex = selectStudent.getSelectedStudent();
-            if(actionType.equals("Delete")){
-                modelDB.deleteStudent(selectedIndex);
-                modelDB.saveStudentData();
-                studentDB.tableModel.removeRow(selectedIndex);
-                selectStudent.dispose();
+            if(type == 0){
+                if(actionType.equals("Delete")){
+                    modelDB.deleteStudent(selectedIndex);
+                    modelDB.saveData(0);
+                    studentDB.tableModel.removeRow(selectedIndex);
+                    selectStudent.dispose();
+                }
+                if(actionType.equals("Edit")){
+                    input = new InputFrame("Edit Student Data", 0);
+                    input.addSubmitListener(new submitListener("Edit", selectedIndex));
+                    input.setCourseCodeList(modelDB.courseCodeList.toArray(new String[0]));
+
+                    String[] currentStudentData = modelDB.getStudentData(selectedIndex);
+                    input.setNameText(currentStudentData[0]);
+                    input.setIdText(currentStudentData[1]);
+                    input.setYearText(currentStudentData[2]);
+                    input.setGenderType(currentStudentData[3]);
+                    input.setCourseText(currentStudentData[4]);
+
+                    selectStudent.dispose();
+                }
             }
-            if(actionType.equals("Edit")){
-                inputStudent = new InputFrame("Edit Student Data");
-                inputStudent.addSubmitListener(new submitListener("Edit", selectedIndex));
-                inputStudent.setCourseCodeList(modelDB.courseCodeList.toArray(new String[0]));
-                
-                String[] currentStudentData = modelDB.getStudentData(selectedIndex);
-                inputStudent.setNameText(currentStudentData[0]);
-                inputStudent.setIdText(currentStudentData[1]);
-                inputStudent.setYearText(currentStudentData[2]);
-                inputStudent.setGenderType(currentStudentData[3]);
-                inputStudent.setCourseText(currentStudentData[4]);
-                
-                selectStudent.dispose();
+            if(type == 1){
+                //to do code here
             }
         }
     }
     
     /*DatabaseFrame ActionListeners*/
+    class addListener implements ActionListener{
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(type == 0){
+                input = new InputFrame("Add Student Data", 0);
+                input.addSubmitListener(new submitListener("Add", 0));
+                input.setCourseCodeList(modelDB.courseCodeList.toArray(new String[0]));
+            }
+            if(type == 1){
+                input = new InputFrame("Add Course", 1);
+                input.addSubmitListener(new submitListener("Add", 0));
+            }
+        }
+    }
     class editListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -169,18 +199,10 @@ public class DatabaseController {
         @Override
         public void actionPerformed(ActionEvent e) {
             modelDB.studentObjects.clear();
-            modelDB.saveStudentData();
+            modelDB.saveData(0);
             for(int i=studentDB.tableModel.getRowCount()-1; i>=0; i--){
                 studentDB.tableModel.removeRow(i);
             }
-        }
-    }
-    class addListener implements ActionListener{
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            inputStudent = new InputFrame("Add Student Data");
-            inputStudent.addSubmitListener(new submitListener("Add", 0));
-            inputStudent.setCourseCodeList(modelDB.courseCodeList.toArray(new String[0]));
         }
     }
 }

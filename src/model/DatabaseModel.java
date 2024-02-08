@@ -53,17 +53,23 @@ public class DatabaseModel {
         studentObjects.add(new Students(name, gender, id, yearLevel, courseCode));
         studentList.add(name);
     }
-    
     /*Save Students Data into studentDB.csv*/
-    public void saveStudentData(){
+    public void saveData(int type){
         BufferedWriter writer = null;
          try {
-             writer = new BufferedWriter (new FileWriter(studentFile));
-             
-             for(Students student: studentObjects){
-                 writer.write(student.getName()+","+student.getGender()+","+student.getId()+","+student.getYear()+","+student.getCourseCode()+"\n");
-                 
+             if(type == 0){
+                writer = new BufferedWriter (new FileWriter(studentFile));
+                for(Students student: studentObjects){
+                    writer.write(student.getName()+","+student.getGender()+","+student.getId()+","+student.getYear()+","+student.getCourseCode()+"\n");
+                }
              }
+             if(type == 1){
+                writer = new BufferedWriter (new FileWriter(courseFile));
+                for(Courses course: courseObjects){
+                    writer.write(course.getCourseCode()+","+course.getCourseName()+"\n");
+                }
+             }
+             
          } catch (IOException ex) {
              ex.printStackTrace();
          }
@@ -75,7 +81,6 @@ public class DatabaseModel {
             }
          }
     }
-    
     /*Method to extract Student data and input to Objects*/
     public void extractStudentData(){
         BufferedReader reader = null;
@@ -84,7 +89,6 @@ public class DatabaseModel {
              reader = new BufferedReader(new FileReader(studentFile));
              int index = 0;
              while((line = reader.readLine()) != null){
-                    int iterator = 0;
                     String[] studentData = line.split(",");
                     studentObjects.add(new Students(studentData[0], studentData[1], studentData[2], studentData[3], studentData[4]));
                     studentList.add(studentData[0]);
@@ -103,7 +107,33 @@ public class DatabaseModel {
             }
          }
     }
+    /*Returns the student data of index specified student object*/
+    public String[] getStudentData(int index){
+        String[] studentData = {studentObjects.get(index).getName(), studentObjects.get(index).getId(), studentObjects.get(index).getYear()
+                                ,studentObjects.get(index).getGender(), studentObjects.get(index).getCourseCode()};
+        return studentData;
+    }
+    /*Set data of selected student*/
+    public void setStudentData(int index, String[] data){
+        studentObjects.get(index).setName(data[0]);
+        studentObjects.get(index).setGender(data[1]);
+        studentObjects.get(index).setId(data[2]);
+        studentObjects.get(index).setYear(data[3]);
+        studentObjects.get(index).setCourseCode(data[4]);
+        
+        studentList.set(index, data[0]);
+    }
+    /*Remove each instance of specified student object and data*/
+    public void deleteStudent(int index){
+        studentObjects.remove(index);
+        studentList.remove(index);
+    }
     
+    /*Create a new course object and set its code and name*/
+    public void createNewCourse(String courseCode, String courseName){
+        courseObjects.add(new Courses(courseCode, courseName));
+        courseCodeList.add(courseCode);
+    }
     /*Method to extract Course Data*/
     public void extractCourseData(){
         BufferedReader reader = null;
@@ -129,6 +159,10 @@ public class DatabaseModel {
                 ex.printStackTrace();
             }
          }
+    }
+    /*Returns the course name of the selected student index*/
+    public String getCourseName (int index){
+        return studentObjects.get(index).getCourseName();
     }
     
     /*Match course code of student-course and assign values to each objects*/
@@ -163,36 +197,6 @@ public class DatabaseModel {
                 tableData[iterator] = individualData;
                 iterator++;
             }
-        }     
-             
-    }
-    
-    /*Returns the student data of index specified student object*/
-    public String[] getStudentData(int index){
-        String[] studentData = {studentObjects.get(index).getName(), studentObjects.get(index).getId(), studentObjects.get(index).getYear()
-                                ,studentObjects.get(index).getGender(), studentObjects.get(index).getCourseCode()};
-        return studentData;
-    }
-    
-    /*Returns the course name of the selected student index*/
-    public String getCourseName (int index){
-        return studentObjects.get(index).getCourseName();
-    }
-    
-    /*Set data of selected student*/
-    public void setStudentData(int index, String[] data){
-        studentObjects.get(index).setName(data[0]);
-        studentObjects.get(index).setGender(data[1]);
-        studentObjects.get(index).setId(data[2]);
-        studentObjects.get(index).setYear(data[3]);
-        studentObjects.get(index).setCourseCode(data[4]);
-        
-        studentList.set(index, data[0]);
-    }
-    
-    /*Remove each instance of specified student object and data*/
-    public void deleteStudent(int index){
-        studentObjects.remove(index);
-        studentList.remove(index);
+        }
     }
 }
