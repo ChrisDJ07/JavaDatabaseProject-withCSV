@@ -15,34 +15,65 @@ import view.SelectFrame;
 public class DatabaseController {
     
     private DatabaseFrame studentDB;
+    private DatabaseFrame courseDB;
     private DatabaseModel modelDB;
     private InputFrame inputStudent;
     private SelectFrame selectStudent;
     
-    public DatabaseController(DatabaseFrame studentDB, DatabaseModel modelDB){
-        this.studentDB = studentDB;
-        this.studentDB.addAddListener(new addListener());
-        this.studentDB.addEditListener(new editListener());
-        this.studentDB.addDeleteListener(new deleteListener());
-        this.studentDB.addClearListener(new clearListener());
-        
+    //integer for GUI type, 0-students 1-courses
+    private int type;
+    
+    public DatabaseController(DatabaseFrame frameDB, DatabaseModel modelDB, int type){
         this.modelDB = modelDB;
         this.modelDB.extractCourseData();
         
-        if(this.modelDB.studentFile.exists() == false){
-            this.modelDB.createStudentFile();
-        }
-        else{
-            this.modelDB.extractStudentData();
-            if(modelDB.studentObjects.isEmpty() == false){
-                this.modelDB.matchCourseCode();
-                this.modelDB.populateTable();
-                this.studentDB.generateTable(modelDB.tableData);
+        if(type == 0){
+            this.type = 0;
+            this.studentDB = frameDB;
+            this.studentDB.addAddListener(new addListener());
+            this.studentDB.addEditListener(new editListener());
+            this.studentDB.addDeleteListener(new deleteListener());
+            this.studentDB.addClearListener(new clearListener());
+
+            if(this.modelDB.studentFile.exists() == false){
+                this.modelDB.createNewFile(0);
             }
             else{
-                this.studentDB.generateTable(new String[0][0]);
+                this.modelDB.extractStudentData();
+                if(modelDB.studentObjects.isEmpty() == false){
+                    this.modelDB.matchCourseCode();
+                    this.modelDB.populateTable(0);
+                    this.studentDB.generateTable(modelDB.tableData, 0);
+                }
+                else{
+                    this.studentDB.generateTable(new String[0][0], 0);
+                }
             }
         }
+        
+        if(type == 1){
+            this.type = 1;
+            this.courseDB = frameDB;
+            this.courseDB.addAddListener(new addListener());
+            this.courseDB.addEditListener(new editListener());
+            this.courseDB.addDeleteListener(new deleteListener());
+            this.courseDB.addClearListener(new clearListener());
+            
+            if(this.modelDB.courseFile.exists() == false){
+                this.modelDB.createNewFile(1);
+            }
+            else{
+                if(modelDB.courseObjects.isEmpty() == false){
+                    this.modelDB.populateTable(1);
+                    this.courseDB.generateTable(modelDB.tableData, 1);
+                }
+                else{
+                    this.courseDB.generateTable(new String[0][0], 1);
+                }
+            }
+        }
+        
+        
         
     }
     

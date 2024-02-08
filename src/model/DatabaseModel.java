@@ -35,9 +35,14 @@ public class DatabaseModel {
     
     /*Create New Student File*/
     //Unecessary??
-    public void createStudentFile(){
+    public void createNewFile(int type){
         try {
-            studentFile.createNewFile();
+            if(type == 0){
+                studentFile.createNewFile();
+            }
+            if(type == 1){
+                courseFile.createNewFile();
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -140,14 +145,26 @@ public class DatabaseModel {
     }
     
     /*Populating Table Data for Table Display*/
-    public void populateTable(){
-             tableData = new String[studentObjects.size()][5];
-             int iterator = 0;
-             for(Students student: studentObjects){
-                 String[] individualData = {student.getName(), student.getGender(), student.getId(), student.getYear(), student.getCourseName()};
-                 tableData[iterator] = individualData;
-                 iterator++;
-             }
+    public void populateTable(int type){
+        if(type == 0){
+            tableData = new String[studentObjects.size()][5];
+            int iterator = 0;
+            for(Students student: studentObjects){
+                String[] individualData = {student.getName(), student.getGender(), student.getId(), student.getYear(), student.getCourseName()};
+                tableData[iterator] = individualData;
+                iterator++;
+            }
+        }
+        if(type == 1){
+            tableData = new String[courseObjects.size()][2];
+            int iterator = 0;
+            for(Courses course: courseObjects){
+                String[] individualData = {course.getCourseCode(), course.getCourseName()};
+                tableData[iterator] = individualData;
+                iterator++;
+            }
+        }     
+             
     }
     
     /*Returns the student data of index specified student object*/

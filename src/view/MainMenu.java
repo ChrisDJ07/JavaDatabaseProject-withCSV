@@ -2,6 +2,7 @@
 package view;
 
 import java.awt.GridLayout;
+import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -35,14 +36,20 @@ public class MainMenu extends JFrame{
         label.setFont(new java.awt.Font("Unispace", 1, 18));
         label.setBounds(40, 25, 225, 100);
         
-        
         panel.add(students);
         panel.add(courses);
         students.setSize(75, 30);
         students.setSize(75, 30);
         
         this.setVisible(true);
-        
+    }
+    
+    public void addStudentsListener (ActionListener studentsListener){
+        students.addActionListener(studentsListener);
+    }
+    
+    public void addCoursesListener (ActionListener coursesListener){
+        courses.addActionListener(coursesListener);
     }
     
     public static void main(String args[]) {
