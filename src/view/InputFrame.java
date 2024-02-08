@@ -44,6 +44,7 @@ public class InputFrame extends JFrame{
         this.setLayout(null);
         this.setResizable(false);
         this.setSize(width,height);
+        this.setLocationRelativeTo(null);
         
         inputField = new JPanel();
         this.add(inputField);

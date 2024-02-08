@@ -37,7 +37,7 @@ public class DatabaseFrame extends JFrame{
         this.setLayout(null);
         this.setResizable(false);
         this.setSize(frameWidth+20,frameHeight+4);
-        
+        this.setLocationRelativeTo(this);
         
     /*Panel for the Title*/
         titlePanel = new JPanel();

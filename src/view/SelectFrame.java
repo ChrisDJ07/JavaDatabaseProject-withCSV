@@ -25,6 +25,7 @@ public class SelectFrame extends JFrame{
         this.setLayout(null);
         this.setResizable(false);
         this.setSize(width,height);
+        this.setLocationRelativeTo(null);
         
         this.add(selectButton);
         selectButton.setBounds(150, 100, 100, 30);
