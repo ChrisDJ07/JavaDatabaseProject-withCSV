@@ -1,0 +1,3 @@
+#ignore IDE files and Directories
+build/
+nbproject/private/
