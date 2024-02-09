@@ -23,18 +23,17 @@ public class MainMenu extends JFrame{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setLayout(null);
         this.setResizable(false);
-        this.setSize(300,400);
-        this.setLocationRelativeTo(null);
+        this.setSize(250,200);
         
         JPanel panel = new JPanel();
         panel.setLayout(new GridLayout(4,1, 20, 10));
         this.add(panel);
-        panel.setBounds(95, 150, 100, 200);
+        panel.setBounds(65, 55, 100, 200);
         
         JLabel label = new JLabel("Database Main Menu");
         this.add(label);
         label.setFont(new java.awt.Font("Unispace", 1, 18));
-        label.setBounds(40, 25, 225, 100);
+        label.setBounds(16, 10, 225, 50);
         
         panel.add(students);
         panel.add(courses);

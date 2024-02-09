@@ -26,7 +26,8 @@ public class main {
         public void actionPerformed(ActionEvent e) {
             DatabaseFrame studentDB =  new DatabaseFrame("Student Database", 0);
             DatabaseModel modelDB = new DatabaseModel();
-            DatabaseController controller = new DatabaseController(studentDB, modelDB, 0);
+            DatabaseController controller = new DatabaseController(studentDB, modelDB, 0, main);
+            main.students.setEnabled(false);
         }
     }
     
@@ -35,7 +36,8 @@ public class main {
         public void actionPerformed(ActionEvent e) {
             DatabaseFrame coursesDB =  new DatabaseFrame("Courses Database", 1);
             DatabaseModel modelDB = new DatabaseModel();
-            DatabaseController controller = new DatabaseController(coursesDB, modelDB, 1);
+            DatabaseController controller = new DatabaseController(coursesDB, modelDB, 1, main);
+            main.courses.setEnabled(false);
         }
     }
 }

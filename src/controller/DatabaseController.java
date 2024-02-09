@@ -8,6 +8,7 @@ import java.awt.event.WindowEvent;
 import model.DatabaseModel;
 import view.DatabaseFrame;
 import view.InputFrame;
+import view.MainMenu;
 import view.SelectFrame;
 
 /**
@@ -28,7 +29,7 @@ public class DatabaseController {
     int type;
     public static String[] courseList;
     
-    public DatabaseController(DatabaseFrame frameDB, DatabaseModel modelDB, int type){
+    public DatabaseController(DatabaseFrame frameDB, DatabaseModel modelDB, int type, MainMenu main){
         this.modelDB = modelDB;
         this.modelDB.extractCourseData();
         courseList = modelDB.courseCodeList.toArray(new String[0]);
@@ -58,6 +59,7 @@ public class DatabaseController {
             studentDB.addWindowListener(new WindowAdapter(){
                 public void windowClosing(WindowEvent e){
                     modelDB.clearStudents();
+                    main.students.setEnabled(true);
                 }
             });
         }
@@ -82,6 +84,11 @@ public class DatabaseController {
                     this.courseDB.generateTable(new String[0][0], 1);
                 }
             }
+            courseDB.addWindowListener(new WindowAdapter(){
+                public void windowClosing(WindowEvent e){
+                    main.courses.setEnabled(true);
+                }
+            });
         }
     }
     
@@ -132,7 +139,6 @@ public class DatabaseController {
                 if(actionType.equals("Edit")){
                     String[] previousData = modelDB.getData(selectedIndex, 1);
                     String[] courseData = {input.getCourseField(), input.getCourseNameField()};
-                    System.out.println(previousData[0]+" =? "+courseData[0]);
                     if(previousData[0] != courseData[0] || previousData[1] != courseData[1]){
                         if(previousData[0].equals(courseData[0])==false){
                             if(courseDB.codeChanged()){
