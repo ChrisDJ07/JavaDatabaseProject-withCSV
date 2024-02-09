@@ -14,8 +14,8 @@ import javax.swing.JPanel;
  */
 public class MainMenu extends JFrame{
     
-    JButton students = new JButton("STUDENTS");
-    JButton courses = new JButton("COURSES");
+    public JButton students = new JButton("STUDENTS");
+    public JButton courses = new JButton("COURSES");
     
     public MainMenu(){
         super("Database Menu");

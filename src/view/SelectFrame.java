@@ -2,7 +2,10 @@
 package view;
 
 import java.awt.event.ActionListener;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 /**
  * Edit interface for the database software.
@@ -13,7 +16,7 @@ public class SelectFrame extends JFrame{
     int width = 400;
     int height = 200;
     
-    JButton selectButton = new JButton("SUBMIT");
+    JButton selectButton = new JButton("SELECT");
     JLabel label;
     JComboBox list;
     

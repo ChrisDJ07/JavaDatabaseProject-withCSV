@@ -13,7 +13,7 @@ public class Students {
     private String yearLevel;
     private String courseCode;
     
-    private String courseName = "N/A - Course Does not Exist";
+    private String courseName;
     
     public Students(String name, String gender, String id, String yearLevel, String courseCode){
         this.name = name;

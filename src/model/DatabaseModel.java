@@ -196,6 +196,8 @@ public class DatabaseModel {
                     student.setCourseName(course.getCourseName());
                     course.studentList.add(student.getName());
                     break;
+                }else{
+                    student.setCourseName("N/A - Course Does not Exist (" + student.getCourseCode() +")");
                 }
             }
         }
@@ -221,5 +223,10 @@ public class DatabaseModel {
                 iterator++;
             }
         }
+    }
+    
+    /*Updates any interrelated data based on course changes*/
+    public void courseUpdate(){
+        //to do code here
     }
 }

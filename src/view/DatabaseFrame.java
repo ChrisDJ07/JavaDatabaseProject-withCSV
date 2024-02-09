@@ -2,7 +2,16 @@
 package view;
 
 import java.awt.event.ActionListener;
-import javax.swing.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -30,6 +39,9 @@ public class DatabaseFrame extends JFrame{
     JButton deleteKey;
     JButton clearKey;
     
+    private static boolean changed;
+    private static String[][] changedData;
+    
     public DatabaseFrame(String name, int type){
         super(name);
 
@@ -53,11 +65,9 @@ public class DatabaseFrame extends JFrame{
             title = new JLabel("STUDENT DATABASE");
         }
         
-        
         titlePanel.add(title);
         title.setFont(new java.awt.Font("Unispace", 1, 24));
         title.setBounds(500,5, frameWidth/3, (frameHeight/10)-5);
-        
         
     /*The students data table*/
         tablePanel = new JPanel();
@@ -86,6 +96,22 @@ public class DatabaseFrame extends JFrame{
         deleteKey.setBounds(590, 5, 120,50);
         clearKey.setBounds(715, 5, 120,50);
         
+        if(type == 0){
+            this.addWindowFocusListener(new WindowFocusListener(){
+                @Override
+                public void windowGainedFocus(WindowEvent e) {
+                    if(changed){
+                        JOptionPane.showMessageDialog(null, "Change in Course Data detected");
+                        tableModel.setRowCount(0);
+                        for(String[] row: changedData){
+                            tableModel.addRow(row);
+                        }
+                    setChangeStatus(false);
+                    }
+                }
+                @Override public void windowLostFocus(WindowEvent e) {}
+            });
+        }
         this.setVisible(true);
     }
     
@@ -115,5 +141,12 @@ public class DatabaseFrame extends JFrame{
         table = new JTable(tableModel);
         tablePanel.add(new JScrollPane(table));
         tablePanel.getComponent(0).setBounds(0,0, frameWidth-4, frameHeight/2);
+    }
+    
+    public void setChangeStatus(boolean status){
+        DatabaseFrame.changed = status;
+    }
+    public void setChangeData(String[][] data){
+        DatabaseFrame.changedData = data;
     }
 }

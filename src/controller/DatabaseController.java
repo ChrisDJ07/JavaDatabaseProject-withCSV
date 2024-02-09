@@ -117,14 +117,19 @@ public class DatabaseController {
                     modelDB.saveData(1);
                     String[] newCourseData = {input.getCourseField(), input.getCourseNameField()};
                     courseDB.tableModel.addRow(newCourseData);
+                    courseDataChange();
                     input.dispose();
                 }
                 if(actionType.equals("Edit")){
+                    String[] previousData = modelDB.getData(selectedIndex, 1);
                     String[] courseData = {input.getCourseField(), input.getCourseNameField()};
-                    modelDB.setData(selectedIndex, courseData, 1);
-                    modelDB.saveData(1);
-                    courseDB.tableModel.removeRow(selectedIndex);
-                    courseDB.tableModel.insertRow(selectedIndex, courseData);
+                    if(previousData[0] != courseData[0] && previousData[1] != courseData[1]){
+                        modelDB.setData(selectedIndex, courseData, 1);
+                        modelDB.saveData(1);
+                        courseDB.tableModel.removeRow(selectedIndex);
+                        courseDB.tableModel.insertRow(selectedIndex, courseData);
+                        courseDataChange();
+                    }
                     input.dispose();
                 }
             }
@@ -161,7 +166,6 @@ public class DatabaseController {
                     input.setYearText(currentData[2]);
                     input.setGenderType(currentData[3]);
                     input.setCourseText(currentData[4]);
-
                     selectStudent.dispose();
                 }
             }
@@ -172,6 +176,7 @@ public class DatabaseController {
                     modelDB.delete(selectedIndex, 1);
                     modelDB.saveData(1);
                     courseDB.tableModel.removeRow(selectedIndex);
+                    courseDataChange();
                     selectCourse.dispose();
                 }
                 if(actionType.equals("Edit")){
@@ -247,7 +252,19 @@ public class DatabaseController {
                 for(int i=courseDB.tableModel.getRowCount()-1; i>=0; i--){
                     courseDB.tableModel.removeRow(i);
                 }
+                courseDataChange();
             }
         }
+    }
+    void courseDataChange(){
+        /*Updates student database*/
+        modelDB.extractStudentData();
+        modelDB.courseCodeList.clear();
+        modelDB.extractCourseData();
+        modelDB.matchCourseCode();
+        modelDB.populateTable(0);
+
+        courseDB.setChangeStatus(true);
+        courseDB.setChangeData(modelDB.tableData);
     }
 }
