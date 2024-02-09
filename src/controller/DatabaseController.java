@@ -24,10 +24,12 @@ public class DatabaseController {
     
     //integer for GUI type, 0-students 1-courses
     int type;
+    public static String[] courseList;
     
     public DatabaseController(DatabaseFrame frameDB, DatabaseModel modelDB, int type){
         this.modelDB = modelDB;
         this.modelDB.extractCourseData();
+        courseList = modelDB.courseCodeList.toArray(new String[0]);
         
         if(type == 0){
             this.type = 0;
@@ -158,7 +160,7 @@ public class DatabaseController {
                 if(actionType.equals("Edit")){
                     input = new InputFrame("Edit Student Data", 0);
                     input.addSubmitListener(new submitListener("Edit", selectedIndex));
-                    input.setCourseCodeList(modelDB.courseCodeList.toArray(new String[0]));
+                    input.setCourseCodeList(courseList);
 
                     String[] currentData = modelDB.getData(selectedIndex, 0);
                     input.setNameText(currentData[0]);
@@ -198,7 +200,7 @@ public class DatabaseController {
             if(type == 0){
                 input = new InputFrame("Add Student Data", 0);
                 input.addSubmitListener(new submitListener("Add", 0));
-                input.setCourseCodeList(modelDB.courseCodeList.toArray(new String[0]));
+                input.setCourseCodeList(courseList);
             }
             if(type == 1){
                 input = new InputFrame("Add Course", 1);
@@ -217,7 +219,7 @@ public class DatabaseController {
             if(type == 1){
                 selectCourse = new SelectFrame("Select Course Data to Edit", 1);
                 selectCourse.addSelectListener(new selectListener("Edit"));
-                selectCourse.setList(modelDB.courseCodeList.toArray(new String[0]));
+                selectCourse.setList(courseList);
             }
         }
     }
@@ -258,9 +260,14 @@ public class DatabaseController {
     }
     void courseDataChange(){
         /*Updates student database*/
-        modelDB.extractStudentData();
         modelDB.courseCodeList.clear();
+        modelDB.courseObjects.clear();
+        modelDB.studentList.clear();
+        modelDB.studentObjects.clear();
+        
+        modelDB.extractStudentData();
         modelDB.extractCourseData();
+        courseList = modelDB.courseCodeList.toArray(new String[0]);
         modelDB.matchCourseCode();
         modelDB.populateTable(0);
 
