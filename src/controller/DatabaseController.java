@@ -3,6 +3,8 @@ package controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import model.DatabaseModel;
 import view.DatabaseFrame;
 import view.InputFrame;
@@ -53,6 +55,11 @@ public class DatabaseController {
                     this.studentDB.generateTable(new String[0][0], 0);
                 }
             }
+            studentDB.addWindowListener(new WindowAdapter(){
+                public void windowClosing(WindowEvent e){
+                    modelDB.clearStudents();
+                }
+            });
         }
         
         if(type == 1){
@@ -125,7 +132,14 @@ public class DatabaseController {
                 if(actionType.equals("Edit")){
                     String[] previousData = modelDB.getData(selectedIndex, 1);
                     String[] courseData = {input.getCourseField(), input.getCourseNameField()};
-                    if(previousData[0] != courseData[0] && previousData[1] != courseData[1]){
+                    System.out.println(previousData[0]+" =? "+courseData[0]);
+                    if(previousData[0] != courseData[0] || previousData[1] != courseData[1]){
+                        if(previousData[0].equals(courseData[0])==false){
+                            if(courseDB.codeChanged()){
+                                modelDB.courseUpdate(modelDB.courseObjects.get(selectedIndex), courseData);
+                                modelDB.saveData(0);
+                            }
+                        }
                         modelDB.setData(selectedIndex, courseData, 1);
                         modelDB.saveData(1);
                         courseDB.tableModel.removeRow(selectedIndex);

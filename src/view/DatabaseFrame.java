@@ -143,6 +143,13 @@ public class DatabaseFrame extends JFrame{
         tablePanel.getComponent(0).setBounds(0,0, frameWidth-4, frameHeight/2);
     }
     
+    public boolean codeChanged(){
+        int option = JOptionPane.showConfirmDialog(null, "Course Code change detected, update Student Data?"
+                                      , "Course Code change alert", 2);
+        if(option == JOptionPane.YES_OPTION){
+            return true;
+        }return false;
+    }
     public void setChangeStatus(boolean status){
         DatabaseFrame.changed = status;
     }

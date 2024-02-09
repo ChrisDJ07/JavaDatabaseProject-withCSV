@@ -21,7 +21,7 @@ public class DatabaseModel {
      public ArrayList<String> studentList = new ArrayList<>(); //List of Students for Table
      public ArrayList<String> courseCodeList = new ArrayList<>();   //List of Course Code for matching
      
-     public ArrayList<Students> studentObjects = new ArrayList<>(); //List of Student Objects for OOP
+     public static ArrayList<Students> studentObjects = new ArrayList<>(); //List of Student Objects for OOP
      public ArrayList<Courses> courseObjects = new ArrayList<>();  //List of Course Objects for OOP
      
      public String[][] tableData;   //2d string for Table Construction
@@ -186,6 +186,7 @@ public class DatabaseModel {
     }
     /*Match course code of student-course and assign values to each objects*/
     public void matchCourseCode(){
+        int iterator = 0;
         for(Students student: studentObjects){
             if(student.getCourseCode().equals("None")){
                 student.setCourseName("Not Enrolled");
@@ -194,12 +195,13 @@ public class DatabaseModel {
             for(Courses course: courseObjects){
                 if(student.getCourseCode().equals(course.getCourseCode())){
                     student.setCourseName(course.getCourseName());
-                    course.studentList.add(student.getName());
+                    course.studentList.add(iterator);
                     break;
                 }else{
                     student.setCourseName("N/A - Course Does not Exist (" + student.getCourseCode() +")");
                 }
             }
+            iterator++;
         }
     }
     
@@ -226,7 +228,12 @@ public class DatabaseModel {
     }
     
     /*Updates any interrelated data based on course changes*/
-    public void courseUpdate(){
-        //to do code here
+    public void courseUpdate(Courses OLD, String[] NEW){
+        for(int index: OLD.studentList){
+            studentObjects.get(index).setCourseCode(NEW[0]);
+        }
+    }
+    public void clearStudents(){
+        studentObjects.clear();
     }
 }
