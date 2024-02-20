@@ -12,7 +12,7 @@ public class Courses {
     private String courseCode;
     private String courseName;
     
-    public ArrayList<String> studentList = new ArrayList<>();
+    public ArrayList<Integer> studentList = new ArrayList<>();
     
     public Courses(String courseCode, String courseName){
         this.courseCode = courseCode;

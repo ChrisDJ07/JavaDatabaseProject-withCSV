@@ -2,7 +2,16 @@
 package view;
 
 import java.awt.event.ActionListener;
-import javax.swing.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -19,9 +28,9 @@ public class DatabaseFrame extends JFrame{
     JLabel title;
     
     JPanel tablePanel;
-    public JTable studentTable;
+    public JTable table;
     public DefaultTableModel tableModel;
-    String[] columns = {"Name", "Gender", "ID", "Year Level","Course"};
+    String[] columns;
     
     JPanel buttonPanel;
     
@@ -30,14 +39,17 @@ public class DatabaseFrame extends JFrame{
     JButton deleteKey;
     JButton clearKey;
     
-    public DatabaseFrame(String name){
+    private static boolean changed;
+    private static String[][] changedData;
+    
+    public DatabaseFrame(String name, int type){
         super(name);
-        
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLayout(null);
         this.setResizable(false);
         this.setSize(frameWidth+20,frameHeight+4);
-        
+        this.setLocationRelativeTo(this);
         
     /*Panel for the Title*/
         titlePanel = new JPanel();
@@ -46,11 +58,16 @@ public class DatabaseFrame extends JFrame{
         titlePanel.setLayout(null);
         
         //Title Label
-        title = new JLabel("STUDENT DATABASE");
+        if(type == 1){
+            title = new JLabel("COURSE DATABASE");
+        }
+        if(type == 0){
+            title = new JLabel("STUDENT DATABASE");
+        }
+        
         titlePanel.add(title);
         title.setFont(new java.awt.Font("Unispace", 1, 24));
         title.setBounds(500,5, frameWidth/3, (frameHeight/10)-5);
-        
         
     /*The students data table*/
         tablePanel = new JPanel();
@@ -79,6 +96,22 @@ public class DatabaseFrame extends JFrame{
         deleteKey.setBounds(590, 5, 120,50);
         clearKey.setBounds(715, 5, 120,50);
         
+        if(type == 0){
+            this.addWindowFocusListener(new WindowFocusListener(){
+                @Override
+                public void windowGainedFocus(WindowEvent e) {
+                    if(changed){
+                        JOptionPane.showMessageDialog(null, "Change in Course Data detected");
+                        tableModel.setRowCount(0);
+                        for(String[] row: changedData){
+                            tableModel.addRow(row);
+                        }
+                    setChangeStatus(false);
+                    }
+                }
+                @Override public void windowLostFocus(WindowEvent e) {}
+            });
+        }
         this.setVisible(true);
     }
     
@@ -95,11 +128,32 @@ public class DatabaseFrame extends JFrame{
         clearKey.addActionListener(clearListener);
     }
     
-    public void generateTable(String[][] tableData){
+    public void generateTable(String[][] tableData, int type){
+        if(type == 0){
+           columns = new String[]{"Name", "Gender", "ID", "Year Level","Course"};
+        }
+        if(type == 1){
+           columns = new String[]{"Course Code", "Course Name"};
+        }
+        
         /*Adding Table to the tablePanel*/
         tableModel = new DefaultTableModel(tableData, columns);
-        studentTable = new JTable(tableModel);
-        tablePanel.add(new JScrollPane(studentTable));
+        table = new JTable(tableModel);
+        tablePanel.add(new JScrollPane(table));
         tablePanel.getComponent(0).setBounds(0,0, frameWidth-4, frameHeight/2);
+    }
+    
+    public boolean codeChanged(){
+        int option = JOptionPane.showConfirmDialog(null, "Course Code change detected, update Student Data?"
+                                      , "Course Code change alert", 2);
+        if(option == JOptionPane.YES_OPTION){
+            return true;
+        }return false;
+    }
+    public void setChangeStatus(boolean status){
+        DatabaseFrame.changed = status;
+    }
+    public void setChangeData(String[][] data){
+        DatabaseFrame.changedData = data;
     }
 }

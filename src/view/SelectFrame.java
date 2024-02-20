@@ -2,7 +2,10 @@
 package view;
 
 import java.awt.event.ActionListener;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 /**
  * Edit interface for the database software.
@@ -13,18 +16,27 @@ public class SelectFrame extends JFrame{
     int width = 400;
     int height = 200;
     
-    JButton selectButton = new JButton("SUBMIT");
-    JLabel label = new JLabel("SELECT STUDENT:");
-    JComboBox studentList;
+    JButton selectButton = new JButton("SELECT");
+    JLabel label;
+    JComboBox list;
     
     
-    public SelectFrame(String title){
+    
+    public SelectFrame(String title, int type){
         super(title);
+        
+        if(type == 0){
+           label = new JLabel("SELECT STUDENT:");
+        }
+        if(type == 1){
+           label = new JLabel("SELECT COURSE:");
+        }
         
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLayout(null);
         this.setResizable(false);
         this.setSize(width,height);
+        this.setLocationRelativeTo(null);
         
         this.add(selectButton);
         selectButton.setBounds(150, 100, 100, 30);
@@ -40,15 +52,15 @@ public class SelectFrame extends JFrame{
     }
     
     /*Set-up Drop-down option*/
-    public void setStudentList(String[] students){
-        studentList = new JComboBox(students);
-        this.add(studentList);
-        studentList.setBounds(150, 40, 150, 30);
+    public void setList(String[] data){
+        list = new JComboBox(data);
+        this.add(list);
+        list.setBounds(150, 40, 150, 30);
     }
     
     /*Return current selected student*/
-    public int getSelectedStudent(){
-        return studentList.getSelectedIndex();
+    public int getSelected(){
+        return list.getSelectedIndex();
     }
 
 }

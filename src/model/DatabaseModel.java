@@ -21,7 +21,7 @@ public class DatabaseModel {
      public ArrayList<String> studentList = new ArrayList<>(); //List of Students for Table
      public ArrayList<String> courseCodeList = new ArrayList<>();   //List of Course Code for matching
      
-     public ArrayList<Students> studentObjects = new ArrayList<>(); //List of Student Objects for OOP
+     public static ArrayList<Students> studentObjects = new ArrayList<>(); //List of Student Objects for OOP
      public ArrayList<Courses> courseObjects = new ArrayList<>();  //List of Course Objects for OOP
      
      public String[][] tableData;   //2d string for Table Construction
@@ -35,9 +35,14 @@ public class DatabaseModel {
     
     /*Create New Student File*/
     //Unecessary??
-    public void createStudentFile(){
+    public void createNewFile(int type){
         try {
-            studentFile.createNewFile();
+            if(type == 0){
+                studentFile.createNewFile();
+            }
+            if(type == 1){
+                courseFile.createNewFile();
+            }
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -48,17 +53,23 @@ public class DatabaseModel {
         studentObjects.add(new Students(name, gender, id, yearLevel, courseCode));
         studentList.add(name);
     }
-    
     /*Save Students Data into studentDB.csv*/
-    public void saveStudentData(){
+    public void saveData(int type){
         BufferedWriter writer = null;
          try {
-             writer = new BufferedWriter (new FileWriter(studentFile));
-             
-             for(Students student: studentObjects){
-                 writer.write(student.getName()+","+student.getGender()+","+student.getId()+","+student.getYear()+","+student.getCourseCode()+"\n");
-                 
+             if(type == 0){
+                writer = new BufferedWriter (new FileWriter(studentFile));
+                for(Students student: studentObjects){
+                    writer.write(student.getName()+","+student.getGender()+","+student.getId()+","+student.getYear()+","+student.getCourseCode()+"\n");
+                }
              }
+             if(type == 1){
+                writer = new BufferedWriter (new FileWriter(courseFile));
+                for(Courses course: courseObjects){
+                    writer.write(course.getCourseCode()+","+course.getCourseName()+"\n");
+                }
+             }
+             
          } catch (IOException ex) {
              ex.printStackTrace();
          }
@@ -70,7 +81,6 @@ public class DatabaseModel {
             }
          }
     }
-    
     /*Method to extract Student data and input to Objects*/
     public void extractStudentData(){
         BufferedReader reader = null;
@@ -79,7 +89,6 @@ public class DatabaseModel {
              reader = new BufferedReader(new FileReader(studentFile));
              int index = 0;
              while((line = reader.readLine()) != null){
-                    int iterator = 0;
                     String[] studentData = line.split(",");
                     studentObjects.add(new Students(studentData[0], studentData[1], studentData[2], studentData[3], studentData[4]));
                     studentList.add(studentData[0]);
@@ -98,7 +107,25 @@ public class DatabaseModel {
             }
          }
     }
+    /*Returns the student data of index specified student object*/
+    public String[] getData(int index, int type){
+        String[] data = null;
+        if(type == 0){
+            data = new String[]{studentObjects.get(index).getName(), studentObjects.get(index).getId(), studentObjects.get(index).getYear()
+                                ,studentObjects.get(index).getGender(), studentObjects.get(index).getCourseCode()};
+        }
+        if(type == 1){
+            data = new String[]{courseObjects.get(index).getCourseCode(), courseObjects.get(index).getCourseName()};
+        }
+        
+        return data;
+    }
     
+    /*Create a new course object and set its code and name*/
+    public void createNewCourse(String courseCode, String courseName){
+        courseObjects.add(new Courses(courseCode, courseName));
+        courseCodeList.add(courseCode);
+    }
     /*Method to extract Course Data*/
     public void extractCourseData(){
         BufferedReader reader = null;
@@ -125,57 +152,88 @@ public class DatabaseModel {
             }
          }
     }
-    
-    /*Match course code of student-course and assign values to each objects*/
-    public void matchCourseCode(){
-        for(Students student: studentObjects){
-            for(Courses course: courseObjects){
-                if(student.getCourseCode().equals(course.getCourseCode())){
-                    student.setCourseName(course.getCourseName());
-                    course.studentList.add(student.getName());
-                    break;
-                }
-            }
-        }
-    }
-    
-    /*Populating Table Data for Table Display*/
-    public void populateTable(){
-             tableData = new String[studentObjects.size()][5];
-             int iterator = 0;
-             for(Students student: studentObjects){
-                 String[] individualData = {student.getName(), student.getGender(), student.getId(), student.getYear(), student.getCourseName()};
-                 tableData[iterator] = individualData;
-                 iterator++;
-             }
-    }
-    
-    /*Returns the student data of index specified student object*/
-    public String[] getStudentData(int index){
-        String[] studentData = {studentObjects.get(index).getName(), studentObjects.get(index).getId(), studentObjects.get(index).getYear()
-                                ,studentObjects.get(index).getGender(), studentObjects.get(index).getCourseCode()};
-        return studentData;
-    }
-    
     /*Returns the course name of the selected student index*/
     public String getCourseName (int index){
         return studentObjects.get(index).getCourseName();
     }
     
-    /*Set data of selected student*/
-    public void setStudentData(int index, String[] data){
-        studentObjects.get(index).setName(data[0]);
-        studentObjects.get(index).setGender(data[1]);
-        studentObjects.get(index).setId(data[2]);
-        studentObjects.get(index).setYear(data[3]);
-        studentObjects.get(index).setCourseCode(data[4]);
-        
-        studentList.set(index, data[0]);
+    /*Set data of selected student/course*/
+    public void setData(int index, String[] data, int type){
+        if(type == 0){
+            studentObjects.get(index).setName(data[0]);
+            studentObjects.get(index).setGender(data[1]);
+            studentObjects.get(index).setId(data[2]);
+            studentObjects.get(index).setYear(data[3]);
+            studentObjects.get(index).setCourseCode(data[4]);
+            studentList.set(index, data[0]);
+        }
+        if(type == 1){
+            courseObjects.get(index).setCourseCode(data[0]);
+            courseObjects.get(index).setCourseName(data[1]);
+            courseCodeList.set(index, data[0]);
+        }
+    }
+    /*Remove each instance of specified student/course object and data*/
+    public void delete(int index, int type){
+        if(type == 0){
+            studentObjects.remove(index);
+            studentList.remove(index);
+        }
+        if(type == 1){
+            courseObjects.remove(index);
+            courseCodeList.remove(index);
+        }
+    }
+    /*Match course code of student-course and assign values to each objects*/
+    public void matchCourseCode(){
+        int iterator = 0;
+        for(Students student: studentObjects){
+            if(student.getCourseCode().equals("None")){
+                student.setCourseName("Not Enrolled");
+                continue;
+            }
+            for(Courses course: courseObjects){
+                if(student.getCourseCode().equals(course.getCourseCode())){
+                    student.setCourseName(course.getCourseName());
+                    course.studentList.add(iterator);
+                    break;
+                }else{
+                    student.setCourseName("N/A - Course Does not Exist (" + student.getCourseCode() +")");
+                }
+            }
+            iterator++;
+        }
     }
     
-    /*Remove each instance of specified student object and data*/
-    public void deleteStudent(int index){
-        studentObjects.remove(index);
-        studentList.remove(index);
+    /*Populating Table Data for Table Display*/
+    public void populateTable(int type){
+        if(type == 0){
+            tableData = new String[studentObjects.size()][5];
+            int iterator = 0;
+            for(Students student: studentObjects){
+                String[] individualData = {student.getName(), student.getGender(), student.getId(), student.getYear(), student.getCourseName()};
+                tableData[iterator] = individualData;
+                iterator++;
+            }
+        }
+        if(type == 1){
+            tableData = new String[courseObjects.size()][2];
+            int iterator = 0;
+            for(Courses course: courseObjects){
+                String[] individualData = {course.getCourseCode(), course.getCourseName()};
+                tableData[iterator] = individualData;
+                iterator++;
+            }
+        }
+    }
+    
+    /*Updates any interrelated data based on course changes*/
+    public void courseUpdate(Courses OLD, String[] NEW){
+        for(int index: OLD.studentList){
+            studentObjects.get(index).setCourseCode(NEW[0]);
+        }
+    }
+    public void clearStudents(){
+        studentObjects.clear();
     }
 }
