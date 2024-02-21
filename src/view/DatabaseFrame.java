@@ -60,6 +60,7 @@ public class DatabaseFrame extends JFrame{
         //Title Label
         if(type == 1){
             title = new JLabel("COURSE DATABASE");
+            this.setSize(1200, 550);
         }
         if(type == 0){
             title = new JLabel("STUDENT DATABASE");
@@ -140,7 +141,11 @@ public class DatabaseFrame extends JFrame{
         tableModel = new DefaultTableModel(tableData, columns);
         table = new JTable(tableModel);
         tablePanel.add(new JScrollPane(table));
-        tablePanel.getComponent(0).setBounds(0,0, frameWidth-4, frameHeight/2);
+        if(type == 1){
+            tablePanel.getComponent(0).setBounds(0,0, frameWidth-71, frameHeight/2);
+        }else{
+            tablePanel.getComponent(0).setBounds(0,0, frameWidth-3, frameHeight/2);
+        }
     }
     
     public boolean codeChanged(){

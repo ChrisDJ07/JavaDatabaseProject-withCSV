@@ -20,7 +20,7 @@ public class DatabaseController {
     //can probably be optimized more
     private DatabaseFrame studentDB;
     private DatabaseFrame courseDB;
-    private DatabaseModel modelDB;
+    private static DatabaseModel modelDB;
     private InputFrame input;
     private SelectFrame selectStudent;
     private SelectFrame selectCourse;
@@ -29,11 +29,17 @@ public class DatabaseController {
     int type;
     public static String[] courseList;
     
-    public DatabaseController(DatabaseFrame frameDB, DatabaseModel modelDB, int type, MainMenu main){
+    public DatabaseController(DatabaseModel modelDB){
         this.modelDB = modelDB;
         this.modelDB.extractCourseData();
-        courseList = modelDB.courseCodeList.toArray(new String[0]);
-        
+        this.modelDB.extractStudentData();
+        if(!(this.modelDB.studentObjects.isEmpty() && this.modelDB.courseObjects.isEmpty())){
+            this.modelDB.matchCourseCode();
+            courseList = modelDB.courseCodeList.toArray(new String[0]);
+        }
+    }
+    
+    public DatabaseController(DatabaseFrame frameDB, int type, MainMenu main){
         if(type == 0){
             this.type = 0;
             this.studentDB = frameDB;
@@ -42,23 +48,17 @@ public class DatabaseController {
             this.studentDB.addDeleteListener(new deleteListener());
             this.studentDB.addClearListener(new clearListener());
 
-            if(this.modelDB.studentFile.exists() == false){
-                this.modelDB.createNewFile(0);
+            if(modelDB.studentObjects.isEmpty() == false){
+                this.modelDB.matchCourseCode();
+                this.modelDB.populateTable(0);
+                this.studentDB.generateTable(modelDB.tableData, 0);
             }
             else{
-                this.modelDB.extractStudentData();
-                if(modelDB.studentObjects.isEmpty() == false){
-                    this.modelDB.matchCourseCode();
-                    this.modelDB.populateTable(0);
-                    this.studentDB.generateTable(modelDB.tableData, 0);
-                }
-                else{
-                    this.studentDB.generateTable(new String[0][0], 0);
-                }
+                this.studentDB.generateTable(new String[0][0], 0);
             }
+            
             studentDB.addWindowListener(new WindowAdapter(){
                 public void windowClosing(WindowEvent e){
-                    modelDB.clearStudents();
                     main.students.setEnabled(true);
                 }
             });
@@ -72,18 +72,14 @@ public class DatabaseController {
             this.courseDB.addDeleteListener(new deleteListener());
             this.courseDB.addClearListener(new clearListener());
             
-            if(this.modelDB.courseFile.exists() == false){
-                this.modelDB.createNewFile(1);
+            if(modelDB.courseObjects.isEmpty() == false){
+                this.modelDB.populateTable(1);
+                this.courseDB.generateTable(modelDB.tableData, 1);
             }
             else{
-                if(modelDB.courseObjects.isEmpty() == false){
-                    this.modelDB.populateTable(1);
-                    this.courseDB.generateTable(modelDB.tableData, 1);
-                }
-                else{
-                    this.courseDB.generateTable(new String[0][0], 1);
-                }
+                this.courseDB.generateTable(new String[0][0], 1);
             }
+            
             courseDB.addWindowListener(new WindowAdapter(){
                 public void windowClosing(WindowEvent e){
                     main.courses.setEnabled(true);
@@ -109,7 +105,7 @@ public class DatabaseController {
                     modelDB.createNewStudent(input.getNameText(), input.getGenderType(),input.getIdText(),
                                              input.getYearText(), input.getCourseCode(modelDB.courseCodeList.toArray(new String[0])));
                     modelDB.saveData(0);
-                    modelDB.matchCourseCode();
+                    refresh();
                     String[] newStudentData = {input.getNameText(), input.getGenderType(),input.getIdText(),
                                              input.getYearText(), modelDB.getCourseName(modelDB.studentList.size()-1)};
                     studentDB.tableModel.addRow(newStudentData);
@@ -120,7 +116,7 @@ public class DatabaseController {
                                              input.getYearText(), input.getCourseCode(modelDB.courseCodeList.toArray(new String[0]))};
                     modelDB.setData(selectedIndex, studentData, 0);
                     modelDB.saveData(0);
-                    modelDB.matchCourseCode();
+                    refresh();
                     studentDB.tableModel.removeRow(selectedIndex);
                     studentData[4] = modelDB.getCourseName(selectedIndex);
                     studentDB.tableModel.insertRow(selectedIndex,studentData);
@@ -174,6 +170,7 @@ public class DatabaseController {
                 if(actionType.equals("Delete")){
                     modelDB.delete(selectedIndex, 0);
                     modelDB.saveData(0);
+                    refresh();
                     studentDB.tableModel.removeRow(selectedIndex);
                     selectStudent.dispose();
                 }
@@ -264,6 +261,7 @@ public class DatabaseController {
             if(type == 0){
                 modelDB.studentObjects.clear();
                 modelDB.saveData(0);
+                refresh();
                 for(int i=studentDB.tableModel.getRowCount()-1; i>=0; i--){
                     studentDB.tableModel.removeRow(i);
                 }
@@ -281,17 +279,21 @@ public class DatabaseController {
     void courseDataChange(){
         /*Updates student database*/
         modelDB.courseCodeList.clear();
+        refresh();
+        courseList = modelDB.courseCodeList.toArray(new String[0]);
+        modelDB.populateTable(0);
+
+        courseDB.setChangeStatus(true);
+        courseDB.setChangeData(modelDB.tableData);
+    }
+    
+    static void refresh(){
         modelDB.courseObjects.clear();
         modelDB.studentList.clear();
         modelDB.studentObjects.clear();
         
         modelDB.extractStudentData();
         modelDB.extractCourseData();
-        courseList = modelDB.courseCodeList.toArray(new String[0]);
         modelDB.matchCourseCode();
-        modelDB.populateTable(0);
-
-        courseDB.setChangeStatus(true);
-        courseDB.setChangeData(modelDB.tableData);
     }
 }

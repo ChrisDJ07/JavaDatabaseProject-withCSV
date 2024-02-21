@@ -15,44 +15,23 @@ import java.util.ArrayList;
  * @author Christian Dave Janiola
  */
 public class DatabaseModel {
-     public File studentFile;   //file for the studentDB.csv
-     public File courseFile;    //file for the courseDB.csv
+     private File studentFile;   //file for the studentDB.csv
+     private File courseFile;    //file for the courseDB.csv
      
      public ArrayList<String> studentList = new ArrayList<>(); //List of Students for Table
      public ArrayList<String> courseCodeList = new ArrayList<>();   //List of Course Code for matching
      
      public static ArrayList<Students> studentObjects = new ArrayList<>(); //List of Student Objects for OOP
-     public ArrayList<Courses> courseObjects = new ArrayList<>();  //List of Course Objects for OOP
+     public static ArrayList<Courses> courseObjects = new ArrayList<>();  //List of Course Objects for OOP
      
      public String[][] tableData;   //2d string for Table Construction
     
     /*Class Constructor*/
-    //What else should it do??
     public DatabaseModel(){
         studentFile = new File("src/studentDB.csv");
         courseFile = new File("src/courseDB.csv");
     }
     
-    /*Create New Student File*/
-    //Unecessary??
-    public void createNewFile(int type){
-        try {
-            if(type == 0){
-                studentFile.createNewFile();
-            }
-            if(type == 1){
-                courseFile.createNewFile();
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-    }
-    
-    /*Create new Student Object*/
-    public void createNewStudent(String name, String gender, String id, String yearLevel, String courseCode){
-        studentObjects.add(new Students(name, gender, id, yearLevel, courseCode));
-        studentList.add(name);
-    }
     /*Save Students Data into studentDB.csv*/
     public void saveData(int type){
         BufferedWriter writer = null;
@@ -81,6 +60,7 @@ public class DatabaseModel {
             }
          }
     }
+    
     /*Method to extract Student data and input to Objects*/
     public void extractStudentData(){
         BufferedReader reader = null;
@@ -106,25 +86,6 @@ public class DatabaseModel {
                 ex.printStackTrace();
             }
          }
-    }
-    /*Returns the student data of index specified student object*/
-    public String[] getData(int index, int type){
-        String[] data = null;
-        if(type == 0){
-            data = new String[]{studentObjects.get(index).getName(), studentObjects.get(index).getId(), studentObjects.get(index).getYear()
-                                ,studentObjects.get(index).getGender(), studentObjects.get(index).getCourseCode()};
-        }
-        if(type == 1){
-            data = new String[]{courseObjects.get(index).getCourseCode(), courseObjects.get(index).getCourseName()};
-        }
-        
-        return data;
-    }
-    
-    /*Create a new course object and set its code and name*/
-    public void createNewCourse(String courseCode, String courseName){
-        courseObjects.add(new Courses(courseCode, courseName));
-        courseCodeList.add(courseCode);
     }
     /*Method to extract Course Data*/
     public void extractCourseData(){
@@ -152,12 +113,32 @@ public class DatabaseModel {
             }
          }
     }
-    /*Returns the course name of the selected student index*/
-    public String getCourseName (int index){
-        return studentObjects.get(index).getCourseName();
+    
+    /*Create new Student Object*/
+    public void createNewStudent(String name, String gender, String id, String yearLevel, String courseCode){
+        studentObjects.add(new Students(name, gender, id, yearLevel, courseCode));
+        studentList.add(name);
+    }
+    /*Create a new course object and set its code and name*/
+    public void createNewCourse(String courseCode, String courseName){
+        courseObjects.add(new Courses(courseCode, courseName));
+        courseCodeList.add(courseCode);
     }
     
-    /*Set data of selected student/course*/
+    /*Returns the student data of index specified student and course object*/
+    public String[] getData(int index, int type){
+        String[] data = null;
+        if(type == 0){
+            data = new String[]{studentObjects.get(index).getName(), studentObjects.get(index).getId(), studentObjects.get(index).getYear()
+                                ,studentObjects.get(index).getGender(), studentObjects.get(index).getCourseCode()};
+        }
+        if(type == 1){
+            data = new String[]{courseObjects.get(index).getCourseCode(), courseObjects.get(index).getCourseName()};
+        }
+        
+        return data;
+    }
+    /*Set data of selected student or course*/
     public void setData(int index, String[] data, int type){
         if(type == 0){
             studentObjects.get(index).setName(data[0]);
@@ -173,6 +154,13 @@ public class DatabaseModel {
             courseCodeList.set(index, data[0]);
         }
     }
+    
+    /*Returns the course name of the selected student index*/
+    //could probably be removed since studentObjects is static already
+    public String getCourseName (int index){
+        return studentObjects.get(index).getCourseName();
+    }
+    
     /*Remove each instance of specified student/course object and data*/
     public void delete(int index, int type){
         if(type == 0){
@@ -184,6 +172,7 @@ public class DatabaseModel {
             courseCodeList.remove(index);
         }
     }
+    
     /*Match course code of student-course and assign values to each objects*/
     public void matchCourseCode(){
         int iterator = 0;
@@ -232,8 +221,5 @@ public class DatabaseModel {
         for(int index: OLD.studentList){
             studentObjects.get(index).setCourseCode(NEW[0]);
         }
-    }
-    public void clearStudents(){
-        studentObjects.clear();
     }
 }
