@@ -15,12 +15,12 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 /**
- * Frame class for the main interface and also
- * the student table interface.
+ * Frame class for the student and course database interface.
  * @author Christian Dave Janiola
  */
 public class DatabaseFrame extends JFrame{
 
+    //int designation for frame dimensions
     int frameHeight = 600;
     int frameWidth = 1250;
     
@@ -39,8 +39,8 @@ public class DatabaseFrame extends JFrame{
     JButton deleteKey;
     JButton clearKey;
     
-    private static boolean changed;
-    private static String[][] changedData;
+    private static boolean changed; //toggles into true if there's a change in course data
+    private static String[][] changedData; //stores the row information of the updated student data
     
     public DatabaseFrame(String name, int type){
         super(name);
@@ -57,10 +57,10 @@ public class DatabaseFrame extends JFrame{
         titlePanel.setBounds(4,2, frameWidth-4, frameHeight/10);
         titlePanel.setLayout(null);
         
-        //Title Label
+        //Title Labels
         if(type == 1){
             title = new JLabel("COURSE DATABASE");
-            this.setSize(1200, 550);
+            this.setSize(1200, 550); //sets different frame dimensions for course database
         }
         if(type == 0){
             title = new JLabel("STUDENT DATABASE");
@@ -70,7 +70,7 @@ public class DatabaseFrame extends JFrame{
         title.setFont(new java.awt.Font("Unispace", 1, 24));
         title.setBounds(500,5, frameWidth/3, (frameHeight/10)-5);
         
-    /*The students data table*/
+    /*The students/course data table*/
         tablePanel = new JPanel();
         this.add(tablePanel);
         tablePanel.setBounds(4,(frameHeight/10)+4, frameWidth-4, (frameHeight/2)-2);
@@ -97,17 +97,21 @@ public class DatabaseFrame extends JFrame{
         deleteKey.setBounds(590, 5, 120,50);
         clearKey.setBounds(715, 5, 120,50);
         
+        /*
+        Check every time the student (type = 0) frame is opened/(in focus) if course data is changed
+        and prompts the user.
+        */ 
         if(type == 0){
-            this.addWindowFocusListener(new WindowFocusListener(){
+            this.addWindowFocusListener(new WindowFocusListener(){ //adding windowFocusListener
                 @Override
                 public void windowGainedFocus(WindowEvent e) {
-                    if(changed){
-                        JOptionPane.showMessageDialog(null, "Change in Course Data detected");
-                        tableModel.setRowCount(0);
-                        for(String[] row: changedData){
+                    if(changed){ //check for "changed" boolean status
+                        JOptionPane.showMessageDialog(null, "Change in Course Data detected"); //prompts user
+                        tableModel.setRowCount(0); //deletes all active rows
+                        for(String[] row: changedData){ //add rows to the table from the "changedData" 2d String
                             tableModel.addRow(row);
                         }
-                    setChangeStatus(false);
+                    setChangeStatus(false); //toggles "changed" boolean status to false
                     }
                 }
                 @Override public void windowLostFocus(WindowEvent e) {}
@@ -116,6 +120,7 @@ public class DatabaseFrame extends JFrame{
         this.setVisible(true);
     }
     
+    // adding button listeners
     public void addEditListener(ActionListener editListener){
         editKey.addActionListener(editListener);
     }
@@ -129,35 +134,52 @@ public class DatabaseFrame extends JFrame{
         clearKey.addActionListener(clearListener);
     }
     
+    // Method to generate the table area in the frame.
     public void generateTable(String[][] tableData, int type){
         if(type == 0){
-           columns = new String[]{"Name", "Gender", "ID", "Year Level","Course"};
+           columns = new String[]{"Name", "Gender", "ID", "Year Level","Course"}; // assigns column headers for student data (type = 0)
         }
         if(type == 1){
-           columns = new String[]{"Course Code", "Course Name"};
+           columns = new String[]{"Course Code", "Course Name"}; // assigns column headers for course data (type = 1)
         }
         
         /*Adding Table to the tablePanel*/
         tableModel = new DefaultTableModel(tableData, columns);
         table = new JTable(tableModel);
         tablePanel.add(new JScrollPane(table));
-        if(type == 1){
+        if(type == 1){ //adjusts table position for course data table
             tablePanel.getComponent(0).setBounds(0,0, frameWidth-71, frameHeight/2);
         }else{
-            tablePanel.getComponent(0).setBounds(0,0, frameWidth-3, frameHeight/2);
+            tablePanel.getComponent(0).setBounds(0,0, frameWidth-3, frameHeight/2); //default value for student data table
         }
     }
     
-    public boolean codeChanged(){
+    /*
+    Method that is called when there is a changed in course code in the courses database.
+    Prompts the user if they wanted to update student data or not.
+    If they choose to update student data, all students enrolled in the course will also update their
+    course code to the updated one.
+    If they choose not to update student data, the student will retain the out of date course code (
+    will display "N/A course does not exist"
+    If they chose neither, the operation will be cancelled.
+    ).
+    */
+    public String codeChanged(){
         int option = JOptionPane.showConfirmDialog(null, "Course Code change detected, update Student Data?"
-                                      , "Course Code change alert", 2);
+                                      , "Course Code change alert", JOptionPane.YES_NO_CANCEL_OPTION);
         if(option == JOptionPane.YES_OPTION){
-            return true;
-        }return false;
+            return "yes";
+        }
+        else if(option == JOptionPane.NO_OPTION){
+            return "no";
+        }
+        return "cancel";
     }
+    //toggles the "changed" boolean variable to true/false
     public void setChangeStatus(boolean status){
         DatabaseFrame.changed = status;
     }
+    //set the value of "changedData" 2d String
     public void setChangeData(String[][] data){
         DatabaseFrame.changedData = data;
     }

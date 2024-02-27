@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.JOptionPane;
 import model.DatabaseModel;
 import view.DatabaseFrame;
 import view.InputFrame;
@@ -17,46 +18,54 @@ import view.SelectFrame;
  */
 public class DatabaseController {
     
-    //can probably be optimized more
-    private DatabaseFrame studentDB;
-    private DatabaseFrame courseDB;
-    private static DatabaseModel modelDB;
-    private InputFrame input;
-    private SelectFrame selectStudent;
-    private SelectFrame selectCourse;
+    private DatabaseFrame studentDB; //student frame
+    private DatabaseFrame courseDB; //course frame
+    private static DatabaseModel modelDB; //general model object
+    private InputFrame input; //general input frame
+    private SelectFrame selectStudent; //student select frame
+    private SelectFrame selectCourse; //course select frame
     
     //integer for GUI type, 0-students 1-courses
     int type;
-    public static String[] courseList;
+    public static String[] courseList; //list of courses by code
     
+    /*
+    Class constructor taking DatabaseModel parameter to init model object.
+    Also initializes extracting of course and student data for the first time.
+    Also matches course codes if student and course data aren't empty.
+    */
     public DatabaseController(DatabaseModel modelDB){
         this.modelDB = modelDB;
-        this.modelDB.extractCourseData();
-        this.modelDB.extractStudentData();
+        this.modelDB.extractData(1);
+        this.modelDB.extractData(0);
         if(!(this.modelDB.studentObjects.isEmpty() && this.modelDB.courseObjects.isEmpty())){
             this.modelDB.matchCourseCode();
-            courseList = modelDB.courseCodeList.toArray(new String[0]);
+            courseList = modelDB.courseCodeList.toArray(new String[0]); //converts 'courseCodeList' arraylist 
+                                                                        // into a String array stored in 'courseList'
         }
     }
     
+    /*
+    Another class constructor for either student/course controller initialization.
+    */
     public DatabaseController(DatabaseFrame frameDB, int type, MainMenu main){
-        if(type == 0){
+        if(type == 0){ //executes this nested if code when type = 0 (Student integer type designation)
             this.type = 0;
             this.studentDB = frameDB;
             this.studentDB.addAddListener(new addListener());
             this.studentDB.addEditListener(new editListener());
             this.studentDB.addDeleteListener(new deleteListener());
             this.studentDB.addClearListener(new clearListener());
-
-            if(modelDB.studentObjects.isEmpty() == false){
-                this.modelDB.matchCourseCode();
+            
+            //populate table data if student objects isn't empty, otherwise populate table with no rows
+            if(!(modelDB.studentObjects.isEmpty())){
                 this.modelDB.populateTable(0);
                 this.studentDB.generateTable(modelDB.tableData, 0);
             }
             else{
                 this.studentDB.generateTable(new String[0][0], 0);
             }
-            
+            //enables student button in "main" when current window is closed
             studentDB.addWindowListener(new WindowAdapter(){
                 public void windowClosing(WindowEvent e){
                     main.students.setEnabled(true);
@@ -64,7 +73,7 @@ public class DatabaseController {
             });
         }
         
-        if(type == 1){
+        if(type == 1){ //executes this nested if code when type = 1 (Course integer type designation)
             this.type = 1;
             this.courseDB = frameDB;
             this.courseDB.addAddListener(new addListener());
@@ -72,6 +81,7 @@ public class DatabaseController {
             this.courseDB.addDeleteListener(new deleteListener());
             this.courseDB.addClearListener(new clearListener());
             
+            //populate table data if course objects isn't empty, otherwise populate table with no rows
             if(modelDB.courseObjects.isEmpty() == false){
                 this.modelDB.populateTable(1);
                 this.courseDB.generateTable(modelDB.tableData, 1);
@@ -79,7 +89,7 @@ public class DatabaseController {
             else{
                 this.courseDB.generateTable(new String[0][0], 1);
             }
-            
+            //enables student button in "main" when current window is closed
             courseDB.addWindowListener(new WindowAdapter(){
                 public void windowClosing(WindowEvent e){
                     main.courses.setEnabled(true);
@@ -90,9 +100,10 @@ public class DatabaseController {
     
     /*InputFrame ActionListener*/
     class submitListener implements ActionListener{
-        private String actionType;
-        private int selectedIndex;
+        private String actionType; //either 'add' or 'edit'
+        private int selectedIndex; //int index used for retrieving student/course object
         
+        //class constructor that init values for 'actionType' and 'selectedIndex'
         public submitListener(String actionType, int selectedIndex){
             this.actionType = actionType;
             this.selectedIndex = selectedIndex;
@@ -104,11 +115,12 @@ public class DatabaseController {
                 if(actionType.equals("Add")){
                     modelDB.createNewStudent(input.getNameText(), input.getGenderType(),input.getIdText(),
                                              input.getYearText(), input.getCourseCode(modelDB.courseCodeList.toArray(new String[0])));
-                    modelDB.saveData(0);
-                    refresh();
+                    modelDB.saveData(0); //save new student data to dedicated csv file
+                    refresh(); //calls refresh function
+                    //stores new student data to string variable to add to table
                     String[] newStudentData = {input.getNameText(), input.getGenderType(),input.getIdText(),
                                              input.getYearText(), modelDB.getCourseName(modelDB.studentList.size()-1)};
-                    studentDB.tableModel.addRow(newStudentData);
+                    studentDB.tableModel.addRow(newStudentData); //add new row for new student data
                     input.dispose();
                 }
                 if(actionType.equals("Edit")){
@@ -126,27 +138,34 @@ public class DatabaseController {
             if(type == 1){
                 if(actionType.equals("Add")){
                     modelDB.createNewCourse(input.getCourseField(), input.getCourseNameField());
-                    modelDB.saveData(1);
+                    modelDB.saveData(1);//save new course data to dedicated csv file
+                    //stores new student data to string variable to add to table
                     String[] newCourseData = {input.getCourseField(), input.getCourseNameField()};
-                    courseDB.tableModel.addRow(newCourseData);
+                    courseDB.tableModel.addRow(newCourseData);//add new row for new course data
                     courseDataChange();
                     input.dispose();
                 }
                 if(actionType.equals("Edit")){
                     String[] previousData = modelDB.getData(selectedIndex, 1);
-                    String[] courseData = {input.getCourseField(), input.getCourseNameField()};
-                    if(previousData[0] != courseData[0] || previousData[1] != courseData[1]){
-                        if(previousData[0].equals(courseData[0])==false){
-                            if(courseDB.codeChanged()){
-                                modelDB.courseUpdate(modelDB.courseObjects.get(selectedIndex), courseData);
-                                modelDB.saveData(0);
+                    String[] courseData = {input.getCourseField(), input.getCourseNameField()}; //new course data
+                    if(previousData[0] != courseData[0] || previousData[1] != courseData[1]){ //check if anything is changed
+                        if(previousData[0].equals(courseData[0])==false){ //checked if course code is changed
+                            String choice = courseDB.codeChanged();
+                            if(choice == "yes"){//calls the codeChanged method confirming if student data should be changed or not, or cancel operation
+                                modelDB.courseUpdate(modelDB.courseObjects.get(selectedIndex), courseData);//updates course codes of affected students
+                                modelDB.saveData(0); //save data to csv file    
                             }
+                            else if(choice == "cancel"){ //check if not "yes" or "no"
+                                return;
+                            }
+                            
                         }
-                        modelDB.setData(selectedIndex, courseData, 1);
-                        modelDB.saveData(1);
+                        modelDB.setData(selectedIndex, courseData, 1); //updates course data
+                        modelDB.saveData(1); //save to csv file
+                        /*updates table*/
                         courseDB.tableModel.removeRow(selectedIndex);
                         courseDB.tableModel.insertRow(selectedIndex, courseData);
-                        courseDataChange();
+                        courseDataChange();//updates students' data
                     }
                     input.dispose();
                 }
@@ -166,20 +185,22 @@ public class DatabaseController {
         public void actionPerformed(ActionEvent e) {
             int selectedIndex;
             if(type == 0){
-                selectedIndex = selectStudent.getSelected();
-                if(actionType.equals("Delete")){
-                    modelDB.delete(selectedIndex, 0);
-                    modelDB.saveData(0);
-                    refresh();
-                    studentDB.tableModel.removeRow(selectedIndex);
+                selectedIndex = selectStudent.getSelected(); //index of selected student
+                if(actionType.equals("Delete") && JOptionPane.showConfirmDialog(null, //dialog to confirm student deletion (skips deletion if false)
+                                "Are you sure you want to delete this student from the database? This operation is permanent.",
+                                "Student Delete alert", 2 )== JOptionPane.YES_OPTION){
+                    modelDB.delete(selectedIndex, 0); //delete student object from arraylist
+                    modelDB.saveData(0); //save data to dedicated csv file
+                    refresh(); //performs database refresh
+                    studentDB.tableModel.removeRow(selectedIndex); //update table
                     selectStudent.dispose();
                 }
                 if(actionType.equals("Edit")){
-                    input = new InputFrame("Edit Student Data", 0);
+                    input = new InputFrame("Edit Student Data", 0); //init new edit inputFrame
                     input.addSubmitListener(new submitListener("Edit", selectedIndex));
                     input.setCourseCodeList(courseList);
-
-                    String[] currentData = modelDB.getData(selectedIndex, 0);
+                    String[] currentData = modelDB.getData(selectedIndex, 0); //get data of selected student
+                    //set fields
                     input.setNameText(currentData[0]);
                     input.setIdText(currentData[1]);
                     input.setYearText(currentData[2]);
@@ -190,18 +211,22 @@ public class DatabaseController {
             }
             /*Update student enrolled to deleted course*/
             if(type == 1){
-                selectedIndex = selectCourse.getSelected();
-                if(actionType.equals("Delete")){
-                    modelDB.delete(selectedIndex, 1);
-                    modelDB.saveData(1);
-                    courseDB.tableModel.removeRow(selectedIndex);
-                    courseDataChange();
+                selectedIndex = selectCourse.getSelected(); //index of selected course
+                if(actionType.equals("Delete") && 
+                        JOptionPane.showConfirmDialog(null, //dialog to confirm course deletion (skips deletion if false)
+                                "Deleting This Course will affect all Students enrolled in this course, proceed?",
+                                "Course Delete alert", 2 )== JOptionPane.YES_OPTION){
+                    modelDB.delete(selectedIndex, 1); //delete course object from arraylist
+                    modelDB.saveData(1); //save data to dedicated csv file
+                    courseDB.tableModel.removeRow(selectedIndex); //update table
+                    courseDataChange(); //update student data
                     selectCourse.dispose();
                 }
                 if(actionType.equals("Edit")){
-                    input = new InputFrame("Edit Course Data", 1);
+                    input = new InputFrame("Edit Course Data", 1); //init new edit inputFrame
                     input.addSubmitListener(new submitListener("Edit", selectedIndex));
-                    String[] currentData = modelDB.getData(selectedIndex, 1);
+                    String[] currentData = modelDB.getData(selectedIndex, 1); //get data of selected course
+                    //set fields
                     input.setCourseField(currentData[0]);
                     input.setCourseNameField(currentData[1]);
                     selectCourse.dispose();
@@ -258,7 +283,9 @@ public class DatabaseController {
     class clearListener implements ActionListener{
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(type == 0){
+            if(type == 0 && JOptionPane.showConfirmDialog(null, //dialog to confirm student data deletion (skips deletion if false)
+                                "Are you sure you want to clear the whole sutdent database? This operation cannot be undone.",
+                                "Student DB Delete alert", 2 )== JOptionPane.YES_OPTION){
                 modelDB.studentObjects.clear();
                 modelDB.saveData(0);
                 refresh();
@@ -266,7 +293,9 @@ public class DatabaseController {
                     studentDB.tableModel.removeRow(i);
                 }
             }
-            if(type == 1){
+            if(type == 1 && JOptionPane.showConfirmDialog(null, //dialog to confirm course data deletion (skips deletion if false)
+                                "Are you sure you want to clear the whole course database? This operation cannot be undone.",
+                                "Course DB Delete alert", 2 )== JOptionPane.YES_OPTION){
                 modelDB.courseObjects.clear();
                 modelDB.saveData(1);
                 for(int i=courseDB.tableModel.getRowCount()-1; i>=0; i--){
@@ -276,8 +305,9 @@ public class DatabaseController {
             }
         }
     }
+    
+    /*Updates student database when course data is changed*/
     void courseDataChange(){
-        /*Updates student database*/
         modelDB.courseCodeList.clear();
         refresh();
         courseList = modelDB.courseCodeList.toArray(new String[0]);
@@ -287,13 +317,14 @@ public class DatabaseController {
         courseDB.setChangeData(modelDB.tableData);
     }
     
+    //performs a database refresh, clears any static variables, and assign values to them
     static void refresh(){
         modelDB.courseObjects.clear();
         modelDB.studentList.clear();
         modelDB.studentObjects.clear();
         
-        modelDB.extractStudentData();
-        modelDB.extractCourseData();
+        modelDB.extractData(0);
+        modelDB.extractData(1);
         modelDB.matchCourseCode();
     }
 }

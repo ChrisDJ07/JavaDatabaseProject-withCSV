@@ -26,13 +26,13 @@ public class DatabaseModel {
      
      public String[][] tableData;   //2d string for Table Construction
     
-    /*Class Constructor*/
+    /*Class Constructor, init file objects with student and course data files*/
     public DatabaseModel(){
         studentFile = new File("src/studentDB.csv");
         courseFile = new File("src/courseDB.csv");
     }
     
-    /*Save Students Data into studentDB.csv*/
+    /*Save Students/Courses Data into dedicated files*/
     public void saveData(int type){
         BufferedWriter writer = null;
          try {
@@ -61,45 +61,32 @@ public class DatabaseModel {
          }
     }
     
-    /*Method to extract Student data and input to Objects*/
-    public void extractStudentData(){
+    /*Method to extract Student/course data and input to designated Objects*/
+    public void extractData(int type){
         BufferedReader reader = null;
         String line = "";
          try {
-             reader = new BufferedReader(new FileReader(studentFile));
-             int index = 0;
-             while((line = reader.readLine()) != null){
-                    String[] studentData = line.split(",");
-                    studentObjects.add(new Students(studentData[0], studentData[1], studentData[2], studentData[3], studentData[4]));
-                    studentList.add(studentData[0]);
-                 index++;
+             if(type == 0){
+                reader = new BufferedReader(new FileReader(studentFile));
+                int index = 0;
+                while((line = reader.readLine()) != null){
+                       String[] studentData = line.split(",");
+                       studentObjects.add(new Students(studentData[0], studentData[1], studentData[2], studentData[3], studentData[4]));
+                       studentList.add(studentData[0]);//stores student names into studentList
+                    index++;
+                } 
              }
-         } catch (FileNotFoundException ex) {
-             ex.printStackTrace();
-         } catch (IOException ex) {
-             ex.printStackTrace();
-         }
-         finally{
-            try {
-                reader.close();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-         }
-    }
-    /*Method to extract Course Data*/
-    public void extractCourseData(){
-        BufferedReader reader = null;
-        String line = "";
-         try {
-             reader = new BufferedReader(new FileReader(courseFile));
-             int index = 0;
-             while((line = reader.readLine()) != null){
-                    String[] courseData = line.split(",");
-                    courseObjects.add(new Courses(courseData[0], courseData[1]));
-                    courseCodeList.add(courseData[0]);
-                 index++;
+             else if(type == 1){
+                 reader = new BufferedReader(new FileReader(courseFile));
+                int index = 0;
+                while((line = reader.readLine()) != null){
+                       String[] courseData = line.split(",");
+                       courseObjects.add(new Courses(courseData[0], courseData[1]));
+                       courseCodeList.add(courseData[0]); //add course code to courseCodeList
+                    index++;
+                }
              }
+             
          } catch (FileNotFoundException ex) {
              ex.printStackTrace();
          } catch (IOException ex) {
@@ -125,7 +112,7 @@ public class DatabaseModel {
         courseCodeList.add(courseCode);
     }
     
-    /*Returns the student data of index specified student and course object*/
+    /*Returns the student/course data of index specified student/course object*/
     public String[] getData(int index, int type){
         String[] data = null;
         if(type == 0){
@@ -156,7 +143,6 @@ public class DatabaseModel {
     }
     
     /*Returns the course name of the selected student index*/
-    //could probably be removed since studentObjects is static already
     public String getCourseName (int index){
         return studentObjects.get(index).getCourseName();
     }
@@ -178,7 +164,7 @@ public class DatabaseModel {
         int iterator = 0;
         for(Students student: studentObjects){
             if(student.getCourseCode().equals("None")){
-                student.setCourseName("Not Enrolled");
+                student.setCourseName("Not Enrolled :<");
                 continue;
             }
             for(Courses course: courseObjects){
@@ -216,7 +202,7 @@ public class DatabaseModel {
         }
     }
     
-    /*Updates any interrelated data based on course changes*/
+    /*Updates Students' course code based on course changes*/
     public void courseUpdate(Courses OLD, String[] NEW){
         for(int index: OLD.studentList){
             studentObjects.get(index).setCourseCode(NEW[0]);

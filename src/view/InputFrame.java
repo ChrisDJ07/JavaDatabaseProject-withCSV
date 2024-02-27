@@ -18,9 +18,11 @@ import javax.swing.JTextField;
  */
 public class InputFrame extends JFrame{
     
+    //init frame dimensions
     int height = 500;
     int width = 400;
     
+    //init anchor coordinates
     int X=75;
     int Y=60;
     
@@ -59,8 +61,8 @@ public class InputFrame extends JFrame{
         
         inputField = new JPanel();
         
+        //input frame for student type (0)
         if(type == 0){
-            
             this.add(inputField);
             inputField.setLayout(null);
             inputField.setBounds(5,5,width-20, height-50);
@@ -89,6 +91,8 @@ public class InputFrame extends JFrame{
             inputField.add(submitButton);
             submitButton.setBounds(X+60,Y*6, 100,40);
         }
+        
+        //input frame for course type (1)
         if(type == 1){            
             this.setSize(400, 250);
             course.setText("COURSE CODE");
@@ -104,8 +108,6 @@ public class InputFrame extends JFrame{
             this.add(submitButton);
             submitButton.setBounds(X+70,Y*3-30, 100,40);
         }
-        
-        
         this.setVisible(true);
     }
     
