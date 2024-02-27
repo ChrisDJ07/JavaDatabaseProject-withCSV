@@ -112,62 +112,93 @@ public class DatabaseController {
         @Override
         public void actionPerformed(ActionEvent e) {
             if(type == 0){
-                if(actionType.equals("Add")){
-                    modelDB.createNewStudent(input.getNameText(), input.getGenderType(),input.getIdText(),
-                                             input.getYearText(), input.getCourseCode(modelDB.courseCodeList.toArray(new String[0])));
-                    modelDB.saveData(0); //save new student data to dedicated csv file
-                    refresh(); //calls refresh function
-                    //stores new student data to string variable to add to table
-                    String[] newStudentData = {input.getNameText(), input.getGenderType(),input.getIdText(),
-                                             input.getYearText(), modelDB.getCourseName(modelDB.studentList.size()-1)};
-                    studentDB.tableModel.addRow(newStudentData); //add new row for new student data
-                    input.dispose();
+                if(actionType.equals("Add" )){
+                    if(modelDB.checkDuplicate(selectedIndex, input.getNameText(),input.getIdText(), 0, "add")){
+                        JOptionPane.showMessageDialog(null, "Student Name or ID Number already taken.");
+                        return;
+                    }
+                    else{
+                        modelDB.createNewStudent(input.getNameText(), input.getGenderType(),input.getIdText(),
+                                                 input.getYearText(), input.getCourseCode(modelDB.courseCodeList.toArray(new String[0])));
+                        modelDB.saveData(0); //save new student data to dedicated csv file
+                        refresh(); //calls refresh function
+                        //stores new student data to string variable to add to table
+                        String[] newStudentData = {input.getNameText(), input.getGenderType(),input.getIdText(),
+                                                 input.getYearText(), modelDB.getCourseName(modelDB.studentList.size()-1)};
+                        studentDB.tableModel.addRow(newStudentData); //add new row for new student data
+                        input.dispose();
+                    }
                 }
                 if(actionType.equals("Edit")){
-                    String[] studentData = {input.getNameText(), input.getGenderType(),input.getIdText(),
-                                             input.getYearText(), input.getCourseCode(modelDB.courseCodeList.toArray(new String[0]))};
-                    modelDB.setData(selectedIndex, studentData, 0);
-                    modelDB.saveData(0);
-                    refresh();
-                    studentDB.tableModel.removeRow(selectedIndex);
-                    studentData[4] = modelDB.getCourseName(selectedIndex);
-                    studentDB.tableModel.insertRow(selectedIndex,studentData);
-                    input.dispose();
+                    if(modelDB.checkDuplicate(selectedIndex, input.getNameText(),input.getIdText(), 0, "edit")){
+                        JOptionPane.showMessageDialog(null, "Student Name or ID Number already taken.");
+                        return;
+                    }
+                    else{
+                        String[] studentData = {input.getNameText(), input.getGenderType(),input.getIdText(),
+                                                 input.getYearText(), input.getCourseCode(modelDB.courseCodeList.toArray(new String[0]))};
+                        modelDB.setData(selectedIndex, studentData, 0);
+                        modelDB.saveData(0);
+                        refresh();
+                        studentDB.tableModel.removeRow(selectedIndex);
+                        studentData[4] = modelDB.getCourseName(selectedIndex);
+                        studentDB.tableModel.insertRow(selectedIndex,studentData);
+                        input.dispose();
+                    }
                 }
             }
             if(type == 1){
                 if(actionType.equals("Add")){
-                    modelDB.createNewCourse(input.getCourseField(), input.getCourseNameField());
-                    modelDB.saveData(1);//save new course data to dedicated csv file
-                    //stores new student data to string variable to add to table
-                    String[] newCourseData = {input.getCourseField(), input.getCourseNameField()};
-                    courseDB.tableModel.addRow(newCourseData);//add new row for new course data
-                    courseDataChange();
-                    input.dispose();
+                    System.out.println(input.getCourseNameField() + "\n" + input.getCourseField());
+                    if(modelDB.checkDuplicate(selectedIndex, input.getCourseNameField(),input.getCourseField(), 1, "add")){
+                        JOptionPane.showMessageDialog(null, "Course Name or Code already taken.");
+                        return;
+                    }
+                    else{
+                        modelDB.createNewCourse(input.getCourseField(), input.getCourseNameField());
+                        modelDB.saveData(1);//save new course data to dedicated csv file
+                        //stores new student data to string variable to add to table
+                        String[] newCourseData = {input.getCourseField(), input.getCourseNameField()};
+                        courseDB.tableModel.addRow(newCourseData);//add new row for new course data
+                        courseDataChange();
+                        input.dispose();
+                    }
                 }
                 if(actionType.equals("Edit")){
-                    String[] previousData = modelDB.getData(selectedIndex, 1);
-                    String[] courseData = {input.getCourseField(), input.getCourseNameField()}; //new course data
-                    if(previousData[0] != courseData[0] || previousData[1] != courseData[1]){ //check if anything is changed
-                        if(previousData[0].equals(courseData[0])==false){ //checked if course code is changed
-                            String choice = courseDB.codeChanged();
-                            if(choice == "yes"){//calls the codeChanged method confirming if student data should be changed or not, or cancel operation
-                                modelDB.courseUpdate(modelDB.courseObjects.get(selectedIndex), courseData);//updates course codes of affected students
-                                modelDB.saveData(0); //save data to csv file    
-                            }
-                            else if(choice == "cancel"){ //check if not "yes" or "no"
-                                return;
-                            }
-                            
-                        }
-                        modelDB.setData(selectedIndex, courseData, 1); //updates course data
-                        modelDB.saveData(1); //save to csv file
-                        /*updates table*/
-                        courseDB.tableModel.removeRow(selectedIndex);
-                        courseDB.tableModel.insertRow(selectedIndex, courseData);
-                        courseDataChange();//updates students' data
+                    if(modelDB.checkDuplicate(selectedIndex, input.getCourseNameField(),input.getCourseField(), 1, "edit")){
+                        JOptionPane.showMessageDialog(null, "Course Name or Code already taken.");
+                        return;
                     }
-                    input.dispose();
+                    else{
+                        String nameField;
+                        if(input.getCourseNameField().isEmpty()){ //solves weird bug when course name field is empty
+                            nameField = " ";
+                        }else {
+                            nameField = input.getCourseNameField();
+                        }
+                        String[] previousData = modelDB.getData(selectedIndex, 1);
+                        String[] courseData = {input.getCourseField(), nameField}; //new course data
+                        if(previousData[0] != courseData[0] || previousData[1] != courseData[1]){ //check if anything is changed
+                            if(previousData[0].equals(courseData[0])==false){ //checked if course code is changed
+                                String choice = courseDB.codeChanged();
+                                if(choice == "yes"){//calls the codeChanged method confirming if student data should be changed or not, or cancel operation
+                                    modelDB.courseUpdate(modelDB.courseObjects.get(selectedIndex), courseData);//updates course codes of affected students
+                                    modelDB.saveData(0); //save data to csv file    
+                                }
+                                else if(choice == "cancel"){ //check if not "yes" or "no"
+                                    return;
+                                }
+
+                            }
+                            modelDB.setData(selectedIndex, courseData, 1); //updates course data
+                            modelDB.saveData(1); //save to csv file
+                            /*updates table*/
+                            courseDB.tableModel.removeRow(selectedIndex);
+                            courseDB.tableModel.insertRow(selectedIndex, courseData);
+                            courseDataChange();//updates students' data
+                        }
+                        input.dispose();
+                    }
                 }
             }
         }

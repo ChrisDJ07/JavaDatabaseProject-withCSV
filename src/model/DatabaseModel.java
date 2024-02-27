@@ -108,7 +108,12 @@ public class DatabaseModel {
     }
     /*Create a new course object and set its code and name*/
     public void createNewCourse(String courseCode, String courseName){
-        courseObjects.add(new Courses(courseCode, courseName));
+        if(courseName.isEmpty()){ //solves bug happening when there is no course entered
+            courseObjects.add(new Courses(courseCode, " "));
+        }
+        else{
+            courseObjects.add(new Courses(courseCode, courseName));
+        }
         courseCodeList.add(courseCode);
     }
     
@@ -157,6 +162,48 @@ public class DatabaseModel {
             courseObjects.remove(index);
             courseCodeList.remove(index);
         }
+    }
+    
+    //function to check if there is a duplicate in Student name, Student Id, course name, or course code when
+    //adding/editing student/course data
+    //RIP optimiizaiton
+    public boolean checkDuplicate(int index, String name, String code, int type, String operation){
+        String Name = name.replace(" ", ""); //remove whitespace
+        String Code = code.replace(" ", ""); //remove whitespace
+        int counter = 0;
+            if(type == 0){
+                for(Students student: studentObjects){
+                    //check if any student Name/course Code match with new data
+                    String studentName = student.getName().replace(" ", "");
+                    String studentID = student.getId().replace(" ", "");
+                    if(operation == "edit" && counter != index && (Name.toLowerCase().equals(studentName.toLowerCase()) 
+                    || Code.toLowerCase().equals(studentID.toLowerCase()))){ //convert all to lowercase for more consitent matching
+                        return true;
+                    }
+                    if(operation == "add" && (Name.toLowerCase().equals(studentName.toLowerCase()) 
+                    || Code.toLowerCase().equals(studentID.toLowerCase()))){
+                        return true;
+                    }
+                    counter++;
+                }
+            }
+            if(type == 1){
+                for(Courses course: courseObjects){
+                    //check if any course Name/course Code match with new data
+                    String courseName = course.getCourseName().replace(" ", "");
+                    String courseCode = course.getCourseCode().replace(" ", "");
+                    if(operation == "edit" && counter != index && (Name.toLowerCase().equals(courseName.toLowerCase()) 
+                    || Code.toLowerCase().equals(courseCode.toLowerCase()))){
+                        return true;
+                    }
+                    if(operation == "add" && (Name.toLowerCase().equals(courseName.toLowerCase()) 
+                    || Code.toLowerCase().equals(courseCode.toLowerCase()))){
+                        return true;
+                    }
+                    counter++;
+                }
+            }
+        return false;
     }
     
     /*Match course code of student-course and assign values to each objects*/
