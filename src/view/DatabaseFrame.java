@@ -1,9 +1,12 @@
 
 package view;
 
+import java.awt.Font;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.util.regex.Pattern;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -12,7 +15,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 /**
  * Frame class for the student and course database interface.
@@ -30,6 +36,7 @@ public class DatabaseFrame extends JFrame{
     JPanel tablePanel;
     public JTable table;
     public DefaultTableModel tableModel;
+    public TableRowSorter<DefaultTableModel> sorter;
     String[] columns;
     
     JPanel buttonPanel;
@@ -38,6 +45,9 @@ public class DatabaseFrame extends JFrame{
     JButton addKey;
     JButton deleteKey;
     JButton clearKey;
+    
+    JTextField searchField;
+    JLabel searchDescription;
     
     private static boolean changed; //toggles into true if there's a change in course data
     private static String[][] changedData; //stores the row information of the updated student data
@@ -48,7 +58,7 @@ public class DatabaseFrame extends JFrame{
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLayout(null);
         this.setResizable(false);
-        this.setSize(frameWidth+20,frameHeight+4);
+        this.setSize(frameWidth+20,frameHeight-50);
         this.setLocationRelativeTo(this);
         
     /*Panel for the Title*/
@@ -61,9 +71,17 @@ public class DatabaseFrame extends JFrame{
         if(type == 1){
             title = new JLabel("COURSE DATABASE");
             this.setSize(1200, 550); //sets different frame dimensions for course database
+            searchDescription = new JLabel("(Search Course ID or Name)");
+            this.add(searchDescription);
+            searchDescription.setBounds(560,(frameHeight/10)+(frameHeight/2)+107-65, 200, 10);
+            searchDescription.setFont(new Font("Arial", Font.PLAIN, 12));
         }
         if(type == 0){
             title = new JLabel("STUDENT DATABASE");
+            searchDescription = new JLabel("(Search Student Name, ID, Gender, Year, Course Code/Name)");
+            this.add(searchDescription);
+            searchDescription.setBounds(468,(frameHeight/10)+(frameHeight/2)+107-65, 350, 10);
+            searchDescription.setFont(new Font("Arial", Font.PLAIN, 12));
         }
         
         titlePanel.add(title);
@@ -81,7 +99,7 @@ public class DatabaseFrame extends JFrame{
         buttonPanel = new JPanel();
         this.add(buttonPanel);
         buttonPanel.setLayout(null);
-        buttonPanel.setBounds(4,(frameHeight/2)+100, frameWidth-4, frameHeight/10);
+        buttonPanel.setBounds(360,(frameHeight/2)+110, frameWidth/2, frameHeight/10);
         
     /*Adding buttons to the interface*/
         editKey = new JButton("EDIT Field");
@@ -92,10 +110,19 @@ public class DatabaseFrame extends JFrame{
         buttonPanel.add(addKey);
         buttonPanel.add(deleteKey);
         buttonPanel.add(clearKey);
-        addKey.setBounds(340, 5, 120,50);
-        editKey.setBounds(465, 5, 120,50);
-        deleteKey.setBounds(590, 5, 120,50);
-        clearKey.setBounds(715, 5, 120,50);
+        addKey.setBounds(0, 10, 120,50);
+        editKey.setBounds(125, 10, 120,50);
+        deleteKey.setBounds(250, 10, 120,50);
+        clearKey.setBounds(375, 10, 120,50);
+        
+    /*Searching*/
+        searchField = new JTextField();
+        JLabel searchLabel = new JLabel("Search:");
+        this.add(searchField);
+        this.add(searchLabel);
+        searchField.setBounds(480,(frameHeight/10)+(frameHeight/2)+107-100, frameWidth/4-4, frameHeight/20);
+        searchLabel.setBounds(420,(frameHeight/10)+(frameHeight/2)+109-100, 70, 20);
+        searchLabel.setFont(new Font("Arial", Font.BOLD, 14));
         
         /*
         Check every time the student (type = 0) frame is opened/(in focus) if course data is changed
@@ -120,7 +147,7 @@ public class DatabaseFrame extends JFrame{
         this.setVisible(true);
     }
     
-    // adding button listeners
+    // adding component listeners
     public void addEditListener(ActionListener editListener){
         editKey.addActionListener(editListener);
     }
@@ -132,6 +159,9 @@ public class DatabaseFrame extends JFrame{
     }
     public void addClearListener(ActionListener clearListener){
         clearKey.addActionListener(clearListener);
+    }
+    public void addSearchListener(KeyListener searchListener){
+        searchField.addKeyListener(searchListener);
     }
     
     // Method to generate the table area in the frame.
@@ -146,6 +176,9 @@ public class DatabaseFrame extends JFrame{
         /*Adding Table to the tablePanel*/
         tableModel = new DefaultTableModel(tableData, columns);
         table = new JTable(tableModel);
+        //add sorter
+        sorter = new TableRowSorter<>(tableModel);
+        table.setRowSorter(sorter);
         tablePanel.add(new JScrollPane(table));
         if(type == 1){ //adjusts table position for course data table
             tablePanel.getComponent(0).setBounds(0,0, frameWidth-71, frameHeight/2);
@@ -182,5 +215,14 @@ public class DatabaseFrame extends JFrame{
     //set the value of "changedData" 2d String
     public void setChangeData(String[][] data){
         DatabaseFrame.changedData = data;
+    }
+    //add filter to row sorter
+    public void addFilter(){
+        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + Pattern.quote(searchField.getText())));
+    }
+    //clear searchField
+    public void clearSearch(){
+        searchField.setText("");
+        addFilter();
     }
 }

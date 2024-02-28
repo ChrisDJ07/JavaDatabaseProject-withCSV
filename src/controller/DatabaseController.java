@@ -3,6 +3,8 @@ package controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JOptionPane;
@@ -56,6 +58,7 @@ public class DatabaseController {
             this.studentDB.addEditListener(new editListener());
             this.studentDB.addDeleteListener(new deleteListener());
             this.studentDB.addClearListener(new clearListener());
+            this.studentDB.addSearchListener(new searchListener());
             
             //populate table data if student objects isn't empty, otherwise populate table with no rows
             if(!(modelDB.studentObjects.isEmpty())){
@@ -80,6 +83,7 @@ public class DatabaseController {
             this.courseDB.addEditListener(new editListener());
             this.courseDB.addDeleteListener(new deleteListener());
             this.courseDB.addClearListener(new clearListener());
+            this.courseDB.addSearchListener(new searchListener());
             
             //populate table data if course objects isn't empty, otherwise populate table with no rows
             if(modelDB.courseObjects.isEmpty() == false){
@@ -271,11 +275,13 @@ public class DatabaseController {
         @Override
         public void actionPerformed(ActionEvent e) {
             if(type == 0){
+                studentDB.clearSearch();
                 input = new InputFrame("Add Student Data", 0);
                 input.addSubmitListener(new submitListener("Add", 0));
                 input.setCourseCodeList(courseList);
             }
             if(type == 1){
+                courseDB.clearSearch();
                 input = new InputFrame("Add Course", 1);
                 input.addSubmitListener(new submitListener("Add", 0));
             }
@@ -285,11 +291,13 @@ public class DatabaseController {
         @Override
         public void actionPerformed(ActionEvent e) {
             if(type == 0){
+                studentDB.clearSearch();
                 selectStudent = new SelectFrame("Select Student Data to Edit", 0);
                 selectStudent.addSelectListener(new selectListener("Edit"));
                 selectStudent.setList(modelDB.studentList.toArray(new String[0]));
             }
             if(type == 1){
+                courseDB.clearSearch();
                 selectCourse = new SelectFrame("Select Course Data to Edit", 1);
                 selectCourse.addSelectListener(new selectListener("Edit"));
                 selectCourse.setList(courseList);
@@ -300,11 +308,13 @@ public class DatabaseController {
         @Override
         public void actionPerformed(ActionEvent e) {
             if(type == 0){
+                studentDB.clearSearch();
                 selectStudent = new SelectFrame("Select Student Data to Delete",1);
                 selectStudent.addSelectListener(new selectListener("Delete"));
                 selectStudent.setList(modelDB.studentList.toArray(new String[0]));
             }
             if(type == 1){
+                courseDB.clearSearch();
                 selectCourse = new SelectFrame("Select Course Data to Delete", 1);
                 selectCourse.addSelectListener(new selectListener("Delete"));
                 selectCourse.setList(modelDB.courseCodeList.toArray(new String[0]));
@@ -317,6 +327,7 @@ public class DatabaseController {
             if(type == 0 && JOptionPane.showConfirmDialog(null, //dialog to confirm student data deletion (skips deletion if false)
                                 "Are you sure you want to clear the whole sutdent database? This operation cannot be undone.",
                                 "Student DB Delete alert", 2 )== JOptionPane.YES_OPTION){
+                studentDB.clearSearch();
                 modelDB.studentObjects.clear();
                 modelDB.saveData(0);
                 refresh();
@@ -327,12 +338,31 @@ public class DatabaseController {
             if(type == 1 && JOptionPane.showConfirmDialog(null, //dialog to confirm course data deletion (skips deletion if false)
                                 "Are you sure you want to clear the whole course database? This operation cannot be undone.",
                                 "Course DB Delete alert", 2 )== JOptionPane.YES_OPTION){
+                courseDB.clearSearch();
                 modelDB.courseObjects.clear();
                 modelDB.saveData(1);
                 for(int i=courseDB.tableModel.getRowCount()-1; i>=0; i--){
                     courseDB.tableModel.removeRow(i);
                 }
                 courseDataChange();
+            }
+        }
+    }
+    
+    class searchListener implements KeyListener{
+        @Override
+        public void keyTyped(KeyEvent e) {
+        }
+        @Override
+        public void keyPressed(KeyEvent e) {
+            //...
+        }
+        @Override
+        public void keyReleased(KeyEvent e) {
+            if(type == 0){
+                studentDB.addFilter();
+            }else{
+                courseDB.addFilter();
             }
         }
     }
