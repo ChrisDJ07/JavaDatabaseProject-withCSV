@@ -177,6 +177,8 @@ public class DatabaseFrame extends JFrame{
         tableModel = new DefaultTableModel(tableData, columns);
         table = new JTable(tableModel);
         //add sorter
+        table.setAutoCreateRowSorter(true);
+        
         sorter = new TableRowSorter<>(tableModel);
         table.setRowSorter(sorter);
         tablePanel.add(new JScrollPane(table));
@@ -219,6 +221,10 @@ public class DatabaseFrame extends JFrame{
     //add filter to row sorter
     public void addFilter(){
         sorter.setRowFilter(RowFilter.regexFilter("(?i)" + Pattern.quote(searchField.getText())));
+    }
+    //sort the tabe by Name
+    public void sort(){
+        
     }
     //clear searchField
     public void clearSearch(){
