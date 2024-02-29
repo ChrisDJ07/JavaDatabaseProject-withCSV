@@ -78,7 +78,7 @@ public class DatabaseFrame extends JFrame{
         }
         if(type == 0){
             title = new JLabel("STUDENT DATABASE");
-            searchDescription = new JLabel("(Search Student Name, ID, Gender, Year, Course Code/Name)");
+            searchDescription = new JLabel("(Search Student Name, Gender, ID, Year, Course Name)");
             this.add(searchDescription);
             searchDescription.setBounds(468,(frameHeight/10)+(frameHeight/2)+107-65, 350, 10);
             searchDescription.setFont(new Font("Arial", Font.PLAIN, 12));
