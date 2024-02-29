@@ -13,6 +13,7 @@ import javax.swing.JLabel;
  */
 public class SelectFrame extends JFrame{
     
+    //init frame dimensions
     int width = 400;
     int height = 200;
     
@@ -20,11 +21,10 @@ public class SelectFrame extends JFrame{
     JLabel label;
     JComboBox list;
     
-    
-    
     public SelectFrame(String title, int type){
         super(title);
         
+        //init label based on type (students = 0, courses = 1)
         if(type == 0){
            label = new JLabel("SELECT STUDENT:");
         }
@@ -58,7 +58,7 @@ public class SelectFrame extends JFrame{
         list.setBounds(150, 40, 150, 30);
     }
     
-    /*Return current selected student*/
+    /*Return current selected student/course*/
     public int getSelected(){
         return list.getSelectedIndex();
     }

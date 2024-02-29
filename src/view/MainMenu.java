@@ -38,7 +38,7 @@ public class MainMenu extends JFrame{
         panel.add(students);
         panel.add(courses);
         students.setSize(75, 30);
-        students.setSize(75, 30);
+        courses.setSize(75, 30);
         
         this.setVisible(true);
     }
@@ -49,9 +49,5 @@ public class MainMenu extends JFrame{
     
     public void addCoursesListener (ActionListener coursesListener){
         courses.addActionListener(coursesListener);
-    }
-    
-    public static void main(String args[]) {
-        MainMenu menu = new MainMenu();
     }
 }
