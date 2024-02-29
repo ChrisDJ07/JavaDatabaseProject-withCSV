@@ -2,6 +2,7 @@
 package view;
 
 
+import java.awt.Font;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -90,6 +91,17 @@ public class InputFrame extends JFrame{
 
             inputField.add(submitButton);
             submitButton.setBounds(X+60,Y*6, 100,40);
+            
+            JLabel necessary1 = new JLabel("(Necessary)");
+            JLabel necessary2 = new JLabel("(Necessary)");
+            JLabel necessary3 = new JLabel("(Necessary)");
+            inputField.add(necessary1);necessary1.setFont(new Font("Arial", Font.PLAIN, 12));
+            inputField.add(necessary2);necessary2.setFont(new Font("Arial", Font.PLAIN, 12));
+            inputField.add(necessary3);necessary3.setFont(new Font("Arial", Font.PLAIN, 12));
+            necessary1.setBounds(205,95,75,15);
+            necessary2.setBounds(205,155,75,15);
+            necessary3.setBounds(205-15,335,75,15);
+            
         }
         
         //input frame for course type (1)
@@ -107,6 +119,13 @@ public class InputFrame extends JFrame{
             courseNameField.setBounds(X+60,Y*2-20, 200,30);
             this.add(submitButton);
             submitButton.setBounds(X+70,Y*3-30, 100,40);
+            
+            JLabel necessary1 = new JLabel("(Necessary)");
+            JLabel necessary2 = new JLabel("(Necessary)");
+            this.add(necessary1);necessary1.setFont(new Font("Arial", Font.PLAIN, 12));
+            this.add(necessary2);necessary2.setFont(new Font("Arial", Font.PLAIN, 12));
+            necessary1.setBounds(200,72,75,15);
+            necessary2.setBounds(200,131,75,15);
         }
         this.setVisible(true);
     }

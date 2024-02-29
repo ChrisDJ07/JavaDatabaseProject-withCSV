@@ -117,7 +117,13 @@ public class DatabaseController {
         public void actionPerformed(ActionEvent e) {
             if(type == 0){
                 if(actionType.equals("Add" )){
-                    if(modelDB.checkDuplicate(selectedIndex, input.getNameText(),input.getIdText(), 0, "add")){
+                    //check if name, id, and course is filled
+                    if(input.getNameText().replace(" ", "").isEmpty() || input.getIdText().replace(" ", "").isEmpty()
+                             || input.getCourseCode(modelDB.courseCodeList.toArray(new String[0])).isEmpty()){
+                        JOptionPane.showMessageDialog( null, "Missing necessary fields.");
+                        return;
+                    } //check for duplicates in name and id
+                    else if(modelDB.checkDuplicate(selectedIndex, input.getNameText(),input.getIdText(), 0, "add")){
                         JOptionPane.showMessageDialog(null, "Student Name or ID Number already taken.");
                         return;
                     }
@@ -134,7 +140,13 @@ public class DatabaseController {
                     }
                 }
                 if(actionType.equals("Edit")){
-                    if(modelDB.checkDuplicate(selectedIndex, input.getNameText(),input.getIdText(), 0, "edit")){
+                    //check if name, id, and course is filled
+                    if(input.getNameText().replace(" ", "").isEmpty() || input.getIdText().replace(" ", "").isEmpty()
+                             || input.getCourseCode(modelDB.courseCodeList.toArray(new String[0])).isEmpty()){
+                        JOptionPane.showMessageDialog( null, "Missing necessary fields.");
+                        return;
+                    } // check for duplicates for name and id
+                    else if(modelDB.checkDuplicate(selectedIndex, input.getNameText(),input.getIdText(), 0, "edit")){
                         JOptionPane.showMessageDialog(null, "Student Name or ID Number already taken.");
                         return;
                     }
@@ -153,8 +165,12 @@ public class DatabaseController {
             }
             if(type == 1){
                 if(actionType.equals("Add")){
-                    System.out.println(input.getCourseNameField() + "\n" + input.getCourseField());
-                    if(modelDB.checkDuplicate(selectedIndex, input.getCourseNameField(),input.getCourseField(), 1, "add")){
+                    //check if the course code and name fields are filled
+                    if(input.getCourseNameField().replace(" ", "").isEmpty() || input.getCourseField().replace(" ", "").isEmpty()){
+                        JOptionPane.showMessageDialog( null, "Missing necessary fields.");
+                        return;
+                    } //check for duplicates in code and name
+                    else if(modelDB.checkDuplicate(selectedIndex, input.getCourseNameField(),input.getCourseField(), 1, "add")){
                         JOptionPane.showMessageDialog(null, "Course Name or Code already taken.");
                         return;
                     }
@@ -169,7 +185,12 @@ public class DatabaseController {
                     }
                 }
                 if(actionType.equals("Edit")){
-                    if(modelDB.checkDuplicate(selectedIndex, input.getCourseNameField(),input.getCourseField(), 1, "edit")){
+                    //check if the course code and name fields are filled
+                    if(input.getCourseNameField().replace(" ", "").isEmpty() || input.getCourseField().replace(" ", "").isEmpty()){
+                        JOptionPane.showMessageDialog( null, "Missing necessary fields.");
+                        return;
+                    } //check for duplicates in code and name
+                    else if(modelDB.checkDuplicate(selectedIndex, input.getCourseNameField(),input.getCourseField(), 1, "edit")){
                         JOptionPane.showMessageDialog(null, "Course Name or Code already taken.");
                         return;
                     }
@@ -348,7 +369,6 @@ public class DatabaseController {
             }
         }
     }
-    
     class searchListener implements KeyListener{
         @Override
         public void keyTyped(KeyEvent e) {
