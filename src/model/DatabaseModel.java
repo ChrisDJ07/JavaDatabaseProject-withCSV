@@ -108,7 +108,7 @@ public class DatabaseModel {
     }
     /*Create a new course object and set its code and name*/
     public void createNewCourse(String courseCode, String courseName){
-        if(courseName.isEmpty()){ //solves bug happening when there is no course entered
+        if(courseName.isEmpty()){ //solves bug happening when there is no course entered (this shouldn't happen anymore)
             courseObjects.add(new Courses(courseCode, " "));
         }
         else{
@@ -210,10 +210,6 @@ public class DatabaseModel {
     public void matchCourseCode(){
         int iterator = 0;
         for(Students student: studentObjects){
-            if(student.getCourseCode().equals("None")){
-                student.setCourseName("Not Enrolled :<");
-                continue;
-            }
             for(Courses course: courseObjects){
                 if(student.getCourseCode().equals(course.getCourseCode())){
                     student.setCourseName(course.getCourseName());

@@ -40,7 +40,7 @@ public class DatabaseController {
         this.modelDB = modelDB;
         this.modelDB.extractData(1);
         this.modelDB.extractData(0);
-        if(!(this.modelDB.studentObjects.isEmpty() && this.modelDB.courseObjects.isEmpty())){
+        if(!(this.modelDB.studentObjects.isEmpty() || this.modelDB.courseObjects.isEmpty())){
             this.modelDB.matchCourseCode();
             courseList = modelDB.courseCodeList.toArray(new String[0]); //converts 'courseCodeList' arraylist 
                                                                         // into a String array stored in 'courseList'
@@ -119,7 +119,7 @@ public class DatabaseController {
                 if(actionType.equals("Add" )){
                     //check if name, id, and course is filled
                     if(input.getNameText().replace(" ", "").isEmpty() || input.getIdText().replace(" ", "").isEmpty()
-                             || input.getCourseCode(modelDB.courseCodeList.toArray(new String[0])).isEmpty()){
+                             || input.getCourseCode(modelDB.courseCodeList.toArray(new String[0]))== "None"){
                         JOptionPane.showMessageDialog( null, "Missing necessary fields.");
                         return;
                     } //check for duplicates in name and id
@@ -142,7 +142,7 @@ public class DatabaseController {
                 if(actionType.equals("Edit")){
                     //check if name, id, and course is filled
                     if(input.getNameText().replace(" ", "").isEmpty() || input.getIdText().replace(" ", "").isEmpty()
-                             || input.getCourseCode(modelDB.courseCodeList.toArray(new String[0])).isEmpty()){
+                             || input.getCourseCode(modelDB.courseCodeList.toArray(new String[0])) == "None"){
                         JOptionPane.showMessageDialog( null, "Missing necessary fields.");
                         return;
                     } // check for duplicates for name and id
@@ -157,7 +157,7 @@ public class DatabaseController {
                         modelDB.saveData(0);
                         refresh();
                         studentDB.tableModel.removeRow(selectedIndex);
-                        studentData[4] = modelDB.getCourseName(selectedIndex);
+                        studentData[4] = modelDB.getCourseName(selectedIndex);//replaces course code with code name to insert into the table
                         studentDB.tableModel.insertRow(selectedIndex,studentData);
                         input.dispose();
                     }
