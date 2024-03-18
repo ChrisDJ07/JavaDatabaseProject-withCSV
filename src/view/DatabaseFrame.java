@@ -222,10 +222,6 @@ public class DatabaseFrame extends JFrame{
     public void addFilter(){
         sorter.setRowFilter(RowFilter.regexFilter("(?i)" + Pattern.quote(searchField.getText())));
     }
-    //sort the tabe by Name
-    public void sort(){
-        
-    }
     //clear searchField
     public void clearSearch(){
         searchField.setText("");
